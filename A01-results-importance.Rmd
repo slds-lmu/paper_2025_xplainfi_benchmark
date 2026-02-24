@@ -1,0 +1,356 @@
+---
+title: "Importance benchmark results"
+format: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup-appendix-01}
+#| echo: false
+knitr::opts_chunk$set(
+	cache = FALSE,
+	echo = FALSE,
+	fig.height = 9,
+	fig.width = 10,
+	fig.align = "center"
+)
+source(here::here("R", "plotting.R"))
+library(ggplot2)
+library(data.table)
+importances <- readRDS(here::here("results", "importance", "importances.rds"))
+```
+
+We present a complete set of the importance results in the form of boxplots split across FI method and learner type, separately for each dataset.
+Table 1 lists all DGPs used in the importance benchmark.
+
+```{r tab-importance-problems-supplement}
+#| echo: false
+library(kableExtra)
+tibble::tribble(
+	~DGP           , ~p , ~description                                          , ~model                                                                            ,
+	"ewald"        ,  5 , "DGP used by Ewald et al. (2024)"                     , r"($Y = X_4 + X_5 + X_4 X_5 + \varepsilon$)"                                      ,
+	"correlated"   ,  4 , "$X_1$ and $X_2$ correlated ($r = 0.25, 0.75$)"       , r"($Y = 2 X_1 + X_3 + \varepsilon$)"                                              ,
+	"interactions" ,  5 , "$X_1$ and $X_2$ interact but have no direct effects" , r"($Y = 2 X_1 X_2 + X_3 + \varepsilon$)"                                          ,
+	"friedman1"    , 10 , "Regression benchmark from mlbench"                   , r"($Y = 10 \sin(\pi X_1 X_2) + 20 (X_3 - 0.5)^2 + 10 X_4 + 5 X_5 + \varepsilon$)" ,
+	"independent"  ,  5 , "Uncorrelated features with direct effects"           , r"($Y = 2 X_1 + X_2 + 0.5 X_3 + \varepsilon$)"                                    ,
+	"confounded"   ,  4 , "Unobserved confounder $H$ with proxy"                , r"($Y = H + X_1 + \varepsilon$)"                                                  ,
+	"mediated"     ,  4 , "Mediator masks exposure variable"                    , r"($Y = 1.5 \cdot \mathrm{mediator} + 0.5 \cdot \mathrm{direct} + \varepsilon$)"  ,
+	"bike sharing" , 12 , "Real-world dataset from mlr3data"                    , "N/A"
+) |>
+	kbl(
+		col.names = c("Dataset", "p", "Description", "Model"),
+		caption = "DGPs used for comparison, alongside their number of features (p) and a brief description. Unless otherwise specified, features in simulated data were drawn from a univariate normal distribution and do not have an effect on the target.",
+		escape = FALSE,
+		booktabs = TRUE
+	) |>
+	kable_styling()
+```
+
+## Importance (scaled) {.tabset}
+
+Importances are scaled to percentages such that 100 is the highest importance value assigned by the corresponding method on a dataset in a given replication.
+
+### Confounded
+
+```{r ap-plot-confounded}
+#| fig.cap: Scaled feature importance scores for the Confounded task by FI method and learner, colored by implementing package.
+plot_importance(
+	importances,
+	type = "scaled",
+	problem = "confounded",
+	method = NULL,
+	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+### Correlated
+
+```{r ap-plot-correlated-25}
+#| fig.cap: Scaled feature importance scores for the Correlated (r = 0.25) task by FI method and learner, colored by implementing package.
+plot_importance(
+	importances[correlation == 0.25],
+	type = "scaled",
+	problem = "correlated",
+	method = NULL,
+	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+```{r ap-plot-correlated-75}
+#| fig.cap: Scaled feature importance scores for the Correlated (r = 0.75) task by FI method and learner, colored by implementing package.
+plot_importance(
+	importances[correlation == 0.75],
+	type = "scaled",
+	problem = "correlated",
+	method = NULL,
+	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+
+### Ewald
+
+```{r ap-plot-ewald}
+#| fig.cap: Scaled feature importance scores for the Ewald task by FI method and learner, colored by implementing package.
+#| #| fig.height: 10
+#| fig.width: 10
+plot_importance(
+	importances,
+	type = "scaled",
+	problem = "ewald",
+	method = NULL,
+	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+
+### Friedman1
+
+```{r ap-plot-friedman1}
+#| fig.cap: Scaled feature importance scores for the Friedman1 task by FI method and learner, colored by implementing package.
+#| fig.height: 14
+plot_importance(
+	importances,
+	type = "scaled",
+	problem = "friedman1",
+	method = NULL,
+	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+### Independent
+
+```{r ap-plot-independent}
+#| fig.cap: Scaled feature importance scores for the Independent task by FI method and learner, colored by implementing package.
+plot_importance(
+	importances,
+	type = "scaled",
+	problem = "independent",
+	method = NULL,
+	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+### Interactions
+
+```{r ap-plot-interactions}
+#| fig.cap: Scaled feature importance scores for the Interactions task by FI method and learner, colored by implementing package.
+plot_importance(
+	importances,
+	type = "scaled",
+	problem = "interactions",
+	method = NULL,
+	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+
+### Mediated
+
+```{r ap-plot-mediated}
+#| fig.cap: Scaled feature importance scores for the mediated task by FI method and learner, colored by implementing package.
+plot_importance(
+	importances,
+	type = "scaled",
+	problem = "mediated",
+	method = NULL,
+	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+### Bike sharing
+
+```{r ap-plot-bikesharing}
+#| fig.height: 13
+#| fig.cap: Scaled feature importance scores for the bike sharing task by FI method and learner, colored by implementing package.
+plot_importance(
+	importances,
+	type = "scaled",
+	problem = "bike_sharing",
+	method = NULL,
+	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+
+## Importance (ranks) {.tabset}
+
+Importances are converted to ranks with 1 being the highest importance score.
+Boxplots across ranks illustrate how consistent the rankings are.
+
+### Confounded
+
+```{r ap-plot-confounded-ranks}
+#| fig.cap: Ranked feature importance scores for the Confounded task by FI method and learner, colored by implementing package.
+plot_importance(
+	importances,
+	type = "rank",
+	problem = "confounded",
+	method = NULL,
+	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+### Correlated
+
+```{r ap-plot-correlated-25-rank}
+#| fig.cap: Ranked feature importance scores for the Correlated (r = 0.25) task by FI method and learner, colored by implementing package.
+plot_importance(
+	importances[correlation == 0.25],
+	type = "rank",
+	problem = "correlated",
+	method = NULL,
+	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+```{r ap-plot-correlated-75-rank}
+#| fig.cap: Ranked feature importance scores for the Correlated (r = 0.75) task by FI method and learner, colored by implementing package.
+plot_importance(
+	importances[correlation == 0.75],
+	type = "rank",
+	problem = "correlated",
+	method = NULL,
+	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+
+### Ewald
+
+```{r ap-plot-ewald-rank}
+#| fig.cap: Ranked feature importance scores for the Ewald task by FI method and learner, colored by implementing package.
+#| #| fig.height: 10
+#| fig.width: 10
+plot_importance(
+	importances,
+	type = "rank",
+	problem = "ewald",
+	method = NULL,
+	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+
+### Friedman1
+
+```{r ap-plot-friedman1-rank}
+#| fig.cap: Ranked feature importance scores for the Friedman1 task by FI method and learner, colored by implementing package.
+#| fig.height: 14
+plot_importance(
+	importances,
+	type = "rank",
+	problem = "friedman1",
+	method = NULL,
+	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+### Independent
+
+```{r ap-plot-independent-rank}
+#| fig.cap: Ranked feature importance scores for the Independent task by FI method and learner, colored by implementing package.
+plot_importance(
+	importances,
+	type = "rank",
+	problem = "independent",
+	method = NULL,
+	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+### Interactions
+
+```{r ap-plot-interactions-rank}
+#| fig.cap: Ranked feature importance scores for the Interactions task by FI method and learner, colored by implementing package.
+plot_importance(
+	importances,
+	type = "rank",
+	problem = "interactions",
+	method = NULL,
+	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+
+### Mediated
+
+```{r ap-plot-mediated-rank}
+#| fig.cap: Ranked feature importance scores for the mediated task by FI method and learner, colored by implementing package.
+plot_importance(
+	importances,
+	type = "rank",
+	problem = "mediated",
+	method = NULL,
+	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+### Bike sharing
+
+```{r ap-plot-bikesharing-rank}
+#| fig.height: 13
+#| fig.cap: Ranked feature importance scores for the bike sharing task by FI method and learner, colored by implementing package.
+plot_importance(
+	importances,
+	type = "rank",
+	problem = "bike_sharing",
+	method = NULL,
+	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```

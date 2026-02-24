@@ -1,0 +1,164 @@
+---
+title: "Runtime benchmark results"
+format: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup-appendix-01}
+#| echo: false
+knitr::opts_chunk$set(
+	cache = FALSE,
+	echo = FALSE,
+	fig.height = 9,
+	fig.width = 10,
+	fig.align = "center"
+)
+source(here::here("R", "plotting.R"))
+library(ggplot2)
+library(data.table)
+runtime <- readRDS(here::here("results", "runtime", "runtime.rds"))
+runtime <- runtime
+```
+
+We present the runtime results in the form of boxplots split across FI method with varying $n$ (`n_samples`) and $p$ (`n_features`).
+
+## Runtime (log10 seconds) {.tabset}
+
+Runtime in seconds as measured during experiments on a high performance computing environment are subject to variance due to the shared environment.
+Measurement is taken for each method exclusively around the function call doing the feature importance computation.
+
+### PFI
+
+```{r ap-plot-runtime-pfi}
+#| fig.cap:
+plot_runtime_scaling(
+	runtime,
+	geom = "pointrange",
+	x_var = "n_features",
+	method = "PFI",
+	color = "package",
+	facets = c("n_samples", "n_repeats"),
+	ncol = 2,
+	logscale = TRUE,
+	labeller = label_both
+)
+```
+
+
+### CFI
+
+```{r ap-plot-runtime-cfi}
+#| fig.cap:
+plot_runtime_scaling(
+	runtime,
+	geom = "pointrange",
+	x_var = "n_features",
+	method = "CFI",
+	color = "package",
+	sampler = c("gaussian"),
+	facets = c("n_samples", "n_repeats"),
+	ncol = 2,
+	logscale = TRUE,
+	labeller = label_both
+)
+```
+
+### mSAGE
+
+```{r ap-plot-runtime-msage}
+#| fig.cap:
+plot_runtime_scaling(
+	runtime,
+	geom = "pointrange",
+	x_var = "n_features",
+	method = "mSAGE",
+	color = "package",
+	sage_n_samples = 100,
+	n_permutations = 100,
+	facets = c("n_samples"),
+	ncol = 2,
+	logscale = TRUE,
+	labeller = label_both
+) +
+	ggtitle(
+		"mSAGE with sage_n_samples = 100, n_permutations = 100"
+	)
+
+plot_runtime_scaling(
+	runtime[package != "sage"],
+	geom = "pointrange",
+	x_var = "n_features",
+	method = "mSAGE",
+	color = "package",
+	n_samples = 5000,
+	facets = c("n_permutations", "sage_n_samples"),
+	ncol = 3,
+	logscale = TRUE,
+	labeller = label_both
+) +
+	ggtitle(
+		"mSAGE with n = 5000"
+	)
+
+plot_runtime_scaling(
+	runtime,
+	geom = "pointrange",
+	x_var = "n_features",
+	method = "mSAGE",
+	color = "package",
+	n_samples = 5000,
+	n_permutations = 100,
+	facets = "sage_n_samples",
+	ncol = 3,
+	logscale = TRUE,
+	labeller = label_both
+) +
+	ggtitle(
+		"mSAGE with n = 5000 and n_permutations = 1000 (where applicable)"
+	)
+```
+
+
+### cSAGE
+
+```{r ap-plot-runtime-csage}
+#| fig.cap:
+
+plot_runtime_scaling(
+	runtime,
+	geom = "pointrange",
+	x_var = "n_features",
+	method = "cSAGE",
+	color = "package",
+	sage_n_samples = 100,
+	n_permutations = 100,
+	facets = c("n_samples"),
+	sampler = c("gaussian"),
+	ncol = 2,
+	logscale = TRUE,
+	labeller = label_both
+) +
+	ggtitle(
+		"cSAGE with sage_n_samples = 100, n_permutations = 100"
+	)
+
+
+plot_runtime_scaling(
+	runtime,
+	geom = "pointrange",
+	x_var = "n_features",
+	method = "cSAGE",
+	color = "package",
+	n_samples = 5000,
+	facets = c("n_permutations", "sage_n_samples"),
+	sampler = c("gaussian"),
+	ncol = 3,
+	logscale = TRUE,
+	labeller = label_both
+) +
+	ggtitle(
+		"cSAGE with n = 5000"
+	)
+```
