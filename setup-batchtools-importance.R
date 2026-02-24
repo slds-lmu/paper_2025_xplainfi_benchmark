@@ -15,7 +15,7 @@ if (!fs::dir_exists(conf$reg_path)) {
 		file.dir = conf$reg_path,
 		packages = c("mlr3learners", "xplainfi"),
 		seed = conf$seed,
-		source = here::here(c("R/helpers.R", "R/helpers-python.R", "config.R"))
+		source = here::here(c("R/helpers.R", "R/helpers-python.R", "config-importance.R"))
 	)
 } else {
 	cli::cli_alert_warning("Loading existing registry at {.file {fs::path_rel(conf$reg_path)}}")
