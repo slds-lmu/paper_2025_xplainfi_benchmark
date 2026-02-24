@@ -27,6 +27,16 @@ rv sync
 
 This creates a project-local R library under `rv/` with all required packages.
 
+The `torch` R package additionally requires a one-time installation of libtorch.
+After `rv sync`, open an R session and run:
+
+```r
+library(torch)
+# Follow the on-screen prompt to install libtorch
+```
+
+This is required for the MLP learner (`mlr3torch`). Without it, jobs using `learner_type = "mlp"` will fail.
+
 ### 2. Install Python packages
 
 Python dependencies are declared in `pyproject.toml` and managed by `uv`.
@@ -96,16 +106,27 @@ source("run-experiment-importance.R")
 source("run-experiment-importance.R")
 ```
 
-### 6. Analyze results
+### 6. Collect results
 
-After jobs complete, the analysis scripts aggregate results from the registry and produce summary data:
+After jobs complete, the collect scripts read the batchtools registries, aggregate raw results, and produce the processed RDS files that the analysis Rmd documents expect:
 
-```r
-source("analysis-importance.R")
-source("analysis-runtime.R")
+```bash
+Rscript collect-results-importance.R
+Rscript collect-results-runtime.R
 ```
 
-Aggregated results are stored in `results/`.
+This produces:
+- `results/importance/importances.rds` — processed importance scores with metadata
+- `results/runtime/runtime.rds` — processed runtime measurements with metadata
+
+### 7. Render analysis documents
+
+The `A01-results-importance.Rmd` and `A02-results-runtime.Rmd` documents read the collected results and produce the figures and tables for the paper:
+
+```bash
+Rscript -e 'rmarkdown::render("A01-results-importance.Rmd")'
+Rscript -e 'rmarkdown::render("A02-results-runtime.Rmd")'
+```
 
 ## Project Structure
 
@@ -119,8 +140,10 @@ Aggregated results are stored in `results/`.
 ├── setup-batchtools-runtime.R     # Creates runtime registry, registers problems/algorithms
 ├── run-experiment-importance.R    # Submit importance benchmark jobs
 ├── run-experiment-runtime.R       # Submit runtime benchmark jobs
-├── analysis-importance.R          # Aggregate and process importance results
-├── analysis-runtime.R             # Aggregate and process runtime results
+├── collect-results-importance.R  # Aggregate registry results into RDS files
+├── collect-results-runtime.R     # Aggregate registry results into RDS files
+├── A01-results-importance.Rmd    # Analysis and figures for importance benchmark
+├── A02-results-runtime.Rmd       # Analysis and figures for runtime benchmark
 ├── R/
 │   ├── helpers.R                  # Shared utilities (create_learner, create_sampler, etc.)
 │   ├── helpers-python.R           # Python/reticulate integration helpers
