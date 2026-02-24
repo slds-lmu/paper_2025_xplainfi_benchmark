@@ -7,7 +7,7 @@ library(batchtools)
 # Load registry
 source("config-runtime.R")
 reg <- loadRegistry(conf$reg_path, writeable = TRUE)
-tab <- unwrap(getJobTable())
+tab <- unwrap(getJobPars())
 getStatus()
 
 # Cluster functions are configured via batchtools.conf.R in the project root.
@@ -15,7 +15,7 @@ getStatus()
 if (!fs::file_exists("batchtools.conf.R")) {
 	cli::cli_alert_warning("No {.file batchtools.conf.R} found, falling back to SSH on localhost")
 	reg$cluster.functions <- makeClusterFunctionsSSH(
-		list(Worker$new("localhost", ncpus = 10, max.load = 40)),
+		list(Worker$new("localhost", ncpus = 4, max.load = 10)),
 		fs.latency = 0
 	)
 }
@@ -29,10 +29,13 @@ tab_r <- tab[!(python)]
 # Run ONE of the following blocks per session (not both!)
 
 # R jobs (run in one session):
-submitJobs(tab_r[repl == 1])
+tab_first_r <- ijon(findExperiments(repls = 1), tab_r)
+tab_first_py <- ijon(findExperiments(repls = 1), tab_py)
+
+submitJobs(tab_first_r)
 
 # Python jobs (run in a separate session):
-# submitJobs(tab_py[repl == 1])
+# submitJobs(tab_first_py)
 
 # --- Step 2: After verifying repl 1 results, submit remaining replications ---
 # Adapt resources to your compute environment (walltime, memory).
