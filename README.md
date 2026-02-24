@@ -11,7 +11,7 @@ There are two separate benchmarks, each with their own configuration, setup, exe
 ## Prerequisites
 
 - **R >= 4.5** (see `rproject.toml`)
-- **Python == 3.12** (see `pyproject.toml`n `.python-version`)
+- **Python == 3.12** (see `pyproject.toml` `.python-version`)
 - **[rv](https://a2-ai.github.io/rv-docs/)** — R dependency manager (handles all R packages including `xplainfi`)
 - **[uv](https://docs.astral.sh/uv/)** — Python dependency manager (handles Python implementations)
 
@@ -85,7 +85,9 @@ Example for local multicore execution:
 cluster.functions <- makeClusterFunctionsMulticore(ncpus = 4)
 ```
 
-If no `batchtools.conf.R` exists, the run scripts fall back to `makeClusterFunctionsSSH()` on localhost.
+If no `batchtools.conf.R` exists, the run scripts fall back to `makeClusterFunctionsSSH()` on localhost, which is another option for multicore execution on the current machine.
+Adjust the number of parallel jobs according to your hardware.
+Each job will consume one thread.
 
 ### 5. Run experiments
 
@@ -225,7 +227,7 @@ Learner type is part of the **problem** design (not algorithm design), ensuring 
 
 ## Troubleshooting
 
-### Python environment conflicts (HPC systems)
+### Python environment conflicts
 
 The `.Rprofile` forces `reticulate` to use the project-local `.venv`.
 On HPC systems, tools like **spack** can set `PYTHONPATH` to incompatible Python packages.
