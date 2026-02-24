@@ -1,5 +1,5 @@
 [project]
-name = "xplainfi-benchmark"
+name = "paper_2025_xplainfi_benchmark"
 version = "0.1.0"
 description = "Python dependencies for xplainfi benchmark experiments"
 readme = "README.md"

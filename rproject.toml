@@ -1,5 +1,5 @@
 [project]
-name = "xplainfi-benchmark"
+name = "paper_2025_xplainfi_benchmark"
 r_version = "4.5"
 
 # A list of repositories to fetch packages from. Order matters: we will try to get a package from each repository in order.
@@ -14,7 +14,7 @@ repositories = [{ alias = "CRAN", url = "https://cloud.r-project.org/" }]
 # {name = "dplyr", git = "https://github.com/tidyverse/dplyr.git", tag = "v1.1.4"},
 dependencies = [
   { name = "xplainfi", git = "https://github.com/mlr-org/xplainfi", tag = "v1.0.0" },
-  { name = "arf", git = "https://github.com/bips-hb/arf", branch = "main" },
+  { name = "arf", git = "https://github.com/bips-hb/arf", commit = "5957fdf0367def59066eb97039e44e43c7634b0c" },
   "mlbench",
   "partykit",
   "mlr3",

@@ -11,6 +11,7 @@ There are two separate benchmarks, each with their own configuration, setup, exe
 ## Prerequisites
 
 - **R >= 4.5** (see `rproject.toml`)
+- **Python == 3.12** (see `pyproject.toml`n `.python-version`)
 - **[rv](https://a2-ai.github.io/rv-docs/)** — R dependency manager (handles all R packages including `xplainfi`)
 - **[uv](https://docs.astral.sh/uv/)** — Python dependency manager (handles Python implementations)
 
