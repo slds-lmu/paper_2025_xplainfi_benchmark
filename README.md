@@ -78,20 +78,13 @@ Example for Slurm:
 cluster.functions <- makeClusterFunctionsSlurm(template = "slurm-simple")
 ```
 
-Example for local multicore execution:
-
-```r
-# batchtools.conf.R
-cluster.functions <- makeClusterFunctionsMulticore(ncpus = 4)
-```
-
 If no `batchtools.conf.R` exists, the run scripts fall back to `makeClusterFunctionsSSH()` on localhost, which is another option for multicore execution on the current machine.
 Adjust the number of parallel jobs according to your hardware.
 Each job will consume one thread.
 
 ### 5. Run experiments
 
-The `run-experiment-*.R` scripts load the registry and submit jobs.
+The `run-experiment-*.R` scripts load the registry for the specific benchmark and submit jobs.
 These are designed as interactive scripts — review and adapt them to your needs.
 
 **Important**: R jobs and Python jobs must be submitted in **separate R sessions**.
@@ -206,24 +199,8 @@ The importance benchmark uses multiple synthetic DGPs and one real-world dataset
 
 ### Runtime benchmark
 
-- **peak** — Peak DGP with varying `n_samples` and `n_features` for systematic runtime scaling analysis
-
-## Experiment Design
-
-The benchmark creates a factorial design combining problems, algorithms, and parameter variations.
-Learner type is part of the **problem** design (not algorithm design), ensuring all methods within a problem-replication are evaluated on identical trained models.
-
-**Job tags** for selective submission and analysis:
-- `python` — jobs using Python reference implementations (fippy, sage)
-- `xplainfi` — jobs using xplainfi methods
-- `real_data` — jobs on real-world data (bike_sharing)
-
-## Reproducibility
-
-- **Within-replication consistency**: All methods within a single replication use identical train/test splits
-- **Across-replication variation**: Different replications use different splits for independent runs
-- **Deterministic seeding**: The `instantiate_resampling()` helper generates seeds from `digest::digest2int(task$hash) + replication`, ensuring results are deterministic and reproducible
-- **Dependency pinning**: R packages are pinned via `rv` (`rproject.toml`), Python packages via `uv` (`uv.lock`)
+- **peak** — Peak DGP with varying `n_samples` and `n_features` for systematic runtime scaling analysis. 
+- Importance scores are ignored.
 
 ## Troubleshooting
 

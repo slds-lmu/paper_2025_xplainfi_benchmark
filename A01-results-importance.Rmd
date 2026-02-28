@@ -15,13 +15,13 @@ knitr::opts_chunk$set(
 	fig.width = 10,
 	fig.align = "center"
 )
-source(here::here("R", "plotting.R"))
 library(ggplot2)
 library(data.table)
+source(here::here("R", "plotting.R"))
 importances <- readRDS(here::here("results", "importance", "importances.rds"))
 ```
 
-We present a complete set of the importance results in the form of boxplots split across FI method and learner type, separately for each dataset.
+Importance results in the form of boxplots split across FI method and learner type, separately for each dataset / DGP.
 Table 1 lists all DGPs used in the importance benchmark.
 
 ```{r tab-importance-problems-supplement}
@@ -36,7 +36,7 @@ tibble::tribble(
 	"independent"  ,  5 , "Uncorrelated features with direct effects"           , r"($Y = 2 X_1 + X_2 + 0.5 X_3 + \varepsilon$)"                                    ,
 	"confounded"   ,  4 , "Unobserved confounder $H$ with proxy"                , r"($Y = H + X_1 + \varepsilon$)"                                                  ,
 	"mediated"     ,  4 , "Mediator masks exposure variable"                    , r"($Y = 1.5 \cdot \mathrm{mediator} + 0.5 \cdot \mathrm{direct} + \varepsilon$)"  ,
-	"bike sharing" , 12 , "Real-world dataset from mlr3data"                    , "N/A"
+	"bike sharing" , 12 , "Real-world dataset              "                    , "N/A"
 ) |>
 	kbl(
 		col.names = c("Dataset", "p", "Description", "Model"),
@@ -203,7 +203,7 @@ plot_importance(
 
 ## Importance (ranks) {.tabset}
 
-Importances are converted to ranks with 1 being the highest importance score.
+Importance scores are converted to ranks with 1 (leftmost) being the highest importance score, i.e., the most important feature as judged by the respective method.
 Boxplots across ranks illustrate how consistent the rankings are.
 
 ### Confounded
