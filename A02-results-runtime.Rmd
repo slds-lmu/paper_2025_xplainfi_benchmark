@@ -2,6 +2,7 @@
 title: "Runtime benchmark results"
 format: 
   html_document:
+    self_contained: false
     toc: true
     toc_float: true
 ---
@@ -11,6 +12,7 @@ format:
 knitr::opts_chunk$set(
 	cache = FALSE,
 	echo = FALSE,
+	fig.path = "figures/runtime/",
 	fig.height = 9,
 	fig.width = 10,
 	fig.align = "center"
@@ -30,7 +32,7 @@ Measurement is taken for each method exclusively around the function call doing 
 
 ### PFI
 
-```{r ap-plot-runtime-pfi}
+```{r plot-runtime-pfi}
 #| fig.cap: "PFI runtime scaling across packages by number of features, faceted by sample size and number of repeats."
 #| fig.alt: "Point-range plot comparing PFI runtime in log10 seconds across packages as the number of features increases, faceted by sample size and number of repeats."
 plot_runtime_scaling(
@@ -49,7 +51,7 @@ plot_runtime_scaling(
 
 ### CFI
 
-```{r ap-plot-runtime-cfi}
+```{r plot-runtime-cfi}
 #| fig.cap: "CFI runtime scaling across packages by number of features using Gaussian sampler, faceted by sample size and number of repeats."
 #| fig.alt: "Point-range plot comparing CFI runtime in log10 seconds across packages as the number of features increases, using a Gaussian conditional sampler, faceted by sample size and number of repeats."
 plot_runtime_scaling(
@@ -68,7 +70,7 @@ plot_runtime_scaling(
 
 ### mSAGE
 
-```{r ap-plot-runtime-msage-1}
+```{r plot-runtime-msage-1}
 #| fig.cap: "mSAGE runtime scaling with sage_n_samples = 100 and n_permutations = 100, faceted by sample size."
 #| fig.alt: "Point-range plot comparing mSAGE runtime in log10 seconds across packages with fixed sage_n_samples and n_permutations, faceted by sample size."
 plot_runtime_scaling(
@@ -89,7 +91,7 @@ plot_runtime_scaling(
 	)
 ```
 
-```{r ap-plot-runtime-msage-2}
+```{r plot-runtime-msage-2}
 #| fig.cap: "mSAGE runtime scaling with n = 5000 (excluding sage package), faceted by n_permutations and sage_n_samples."
 #| fig.alt: "Point-range plot comparing mSAGE runtime in log10 seconds across packages at n = 5000, faceted by n_permutations and sage_n_samples."
 plot_runtime_scaling(
@@ -109,8 +111,8 @@ plot_runtime_scaling(
 	)
 ```
 
-```{r ap-plot-runtime-msage-3}
-#| fig.height: 8
+```{r plot-runtime-msage-3}
+#| fig.height: 6
 #| fig.cap: "mSAGE runtime scaling with n = 5000 and n_permutations = 100, faceted by sage_n_samples."
 #| fig.alt: "Point-range plot comparing mSAGE runtime in log10 seconds across all packages at n = 5000 and n_permutations = 100, faceted by sage_n_samples."
 plot_runtime_scaling(
@@ -134,7 +136,7 @@ plot_runtime_scaling(
 
 ### cSAGE
 
-```{r ap-plot-runtime-csage-1}
+```{r plot-runtime-csage-1}
 #| fig.cap: "cSAGE runtime scaling with sage_n_samples = 100 and n_permutations = 100 using Gaussian sampler, faceted by sample size."
 #| fig.alt: "Point-range plot comparing cSAGE runtime in log10 seconds across packages with fixed sage_n_samples and n_permutations using Gaussian sampler, faceted by sample size."
 plot_runtime_scaling(
@@ -156,7 +158,7 @@ plot_runtime_scaling(
 	)
 ```
 
-```{r ap-plot-runtime-csage-2}
+```{r plot-runtime-csage-2}
 #| fig.height: 8
 #| fig.cap: "cSAGE runtime scaling with n = 5000 using Gaussian sampler, faceted by n_permutations and sage_n_samples."
 #| fig.alt: "Point-range plot comparing cSAGE runtime in log10 seconds across packages at n = 5000 using Gaussian sampler, faceted by n_permutations and sage_n_samples."

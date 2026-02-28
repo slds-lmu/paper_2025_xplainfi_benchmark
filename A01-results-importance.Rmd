@@ -2,6 +2,7 @@
 title: "Importance benchmark results"
 format: 
   html_document:
+    self_contained: false
     toc: true
     toc_float: true
 ---
@@ -11,6 +12,7 @@ format:
 knitr::opts_chunk$set(
 	cache = FALSE,
 	echo = FALSE,
+	fig.path = "figures/importance/",
 	fig.height = 9,
 	fig.width = 10,
 	fig.align = "center"
@@ -53,7 +55,7 @@ Importances are scaled to percentages such that 100 is the highest importance va
 
 ### Confounded
 
-```{r ap-plot-confounded}
+```{r plot-confounded}
 #| fig.cap: Scaled feature importance scores for the Confounded task by FI method and learner, colored by implementing package.
 plot_importance(
 	importances,
@@ -69,7 +71,7 @@ plot_importance(
 
 ### Correlated
 
-```{r ap-plot-correlated-25}
+```{r plot-correlated-25}
 #| fig.cap: Scaled feature importance scores for the Correlated (r = 0.25) task by FI method and learner, colored by implementing package.
 plot_importance(
 	importances[correlation == 0.25],
@@ -83,7 +85,7 @@ plot_importance(
 )
 ```
 
-```{r ap-plot-correlated-75}
+```{r plot-correlated-75}
 #| fig.cap: Scaled feature importance scores for the Correlated (r = 0.75) task by FI method and learner, colored by implementing package.
 plot_importance(
 	importances[correlation == 0.75],
@@ -100,7 +102,7 @@ plot_importance(
 
 ### Ewald
 
-```{r ap-plot-ewald}
+```{r plot-ewald}
 #| fig.cap: Scaled feature importance scores for the Ewald task by FI method and learner, colored by implementing package.
 #| #| fig.height: 10
 #| fig.width: 10
@@ -119,7 +121,7 @@ plot_importance(
 
 ### Friedman1
 
-```{r ap-plot-friedman1}
+```{r plot-friedman1}
 #| fig.cap: Scaled feature importance scores for the Friedman1 task by FI method and learner, colored by implementing package.
 #| fig.height: 14
 plot_importance(
@@ -136,7 +138,7 @@ plot_importance(
 
 ### Independent
 
-```{r ap-plot-independent}
+```{r plot-independent}
 #| fig.cap: Scaled feature importance scores for the Independent task by FI method and learner, colored by implementing package.
 plot_importance(
 	importances,
@@ -152,7 +154,7 @@ plot_importance(
 
 ### Interactions
 
-```{r ap-plot-interactions}
+```{r plot-interactions}
 #| fig.cap: Scaled feature importance scores for the Interactions task by FI method and learner, colored by implementing package.
 plot_importance(
 	importances,
@@ -169,7 +171,7 @@ plot_importance(
 
 ### Mediated
 
-```{r ap-plot-mediated}
+```{r plot-mediated}
 #| fig.cap: Scaled feature importance scores for the mediated task by FI method and learner, colored by implementing package.
 plot_importance(
 	importances,
@@ -185,7 +187,7 @@ plot_importance(
 
 ### Bike sharing
 
-```{r ap-plot-bikesharing}
+```{r plot-bikesharing}
 #| fig.height: 13
 #| fig.cap: Scaled feature importance scores for the bike sharing task by FI method and learner, colored by implementing package.
 plot_importance(
@@ -208,7 +210,7 @@ Boxplots across ranks illustrate how consistent the rankings are.
 
 ### Confounded
 
-```{r ap-plot-confounded-ranks}
+```{r plot-confounded-ranks}
 #| fig.cap: Ranked feature importance scores for the Confounded task by FI method and learner, colored by implementing package.
 plot_importance(
 	importances,
@@ -224,7 +226,7 @@ plot_importance(
 
 ### Correlated
 
-```{r ap-plot-correlated-25-rank}
+```{r plot-correlated-25-rank}
 #| fig.cap: Ranked feature importance scores for the Correlated (r = 0.25) task by FI method and learner, colored by implementing package.
 plot_importance(
 	importances[correlation == 0.25],
@@ -238,7 +240,7 @@ plot_importance(
 )
 ```
 
-```{r ap-plot-correlated-75-rank}
+```{r plot-correlated-75-rank}
 #| fig.cap: Ranked feature importance scores for the Correlated (r = 0.75) task by FI method and learner, colored by implementing package.
 plot_importance(
 	importances[correlation == 0.75],
@@ -255,7 +257,7 @@ plot_importance(
 
 ### Ewald
 
-```{r ap-plot-ewald-rank}
+```{r plot-ewald-rank}
 #| fig.cap: Ranked feature importance scores for the Ewald task by FI method and learner, colored by implementing package.
 #| #| fig.height: 10
 #| fig.width: 10
@@ -274,7 +276,7 @@ plot_importance(
 
 ### Friedman1
 
-```{r ap-plot-friedman1-rank}
+```{r plot-friedman1-rank}
 #| fig.cap: Ranked feature importance scores for the Friedman1 task by FI method and learner, colored by implementing package.
 #| fig.height: 14
 plot_importance(
@@ -291,7 +293,7 @@ plot_importance(
 
 ### Independent
 
-```{r ap-plot-independent-rank}
+```{r plot-independent-rank}
 #| fig.cap: Ranked feature importance scores for the Independent task by FI method and learner, colored by implementing package.
 plot_importance(
 	importances,
@@ -307,7 +309,7 @@ plot_importance(
 
 ### Interactions
 
-```{r ap-plot-interactions-rank}
+```{r plot-interactions-rank}
 #| fig.cap: Ranked feature importance scores for the Interactions task by FI method and learner, colored by implementing package.
 plot_importance(
 	importances,
@@ -324,7 +326,7 @@ plot_importance(
 
 ### Mediated
 
-```{r ap-plot-mediated-rank}
+```{r plot-mediated-rank}
 #| fig.cap: Ranked feature importance scores for the mediated task by FI method and learner, colored by implementing package.
 plot_importance(
 	importances,
@@ -340,7 +342,7 @@ plot_importance(
 
 ### Bike sharing
 
-```{r ap-plot-bikesharing-rank}
+```{r plot-bikesharing-rank}
 #| fig.height: 13
 #| fig.cap: Ranked feature importance scores for the bike sharing task by FI method and learner, colored by implementing package.
 plot_importance(

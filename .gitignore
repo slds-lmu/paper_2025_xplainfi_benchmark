@@ -1,6 +1,6 @@
 batchtools.conf.R
 attic
-*.html
+# *.html
 
 # Selectively commit final results later
 results/*
