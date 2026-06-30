@@ -1,6 +1,6 @@
 # Package dependencies, will be checked for installation
 local({
-	packages <- c(
+	packages = c(
 		"xplainfi",
 		"mlr3",
 		"mlr3learners",
@@ -24,7 +24,7 @@ local({
 		"fs"
 	)
 
-	missing_pks <- setdiff(packages, rownames(installed.packages()))
+	missing_pks = setdiff(packages, rownames(installed.packages()))
 
 	if (length(missing_pks) > 0) {
 		cli::cli_warn(c(

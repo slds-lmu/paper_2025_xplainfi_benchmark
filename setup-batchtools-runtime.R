@@ -13,7 +13,7 @@ source(here::here("config-runtime.R"))
 
 if (!fs::dir_exists(conf$reg_path)) {
 	cli::cli_alert_info("Creating registry at {.file {fs::path_rel(conf$reg_path)}}")
-	reg <- makeExperimentRegistry(
+	reg = makeExperimentRegistry(
 		file.dir = conf$reg_path,
 		packages = c("mlr3learners", "xplainfi"),
 		seed = conf$seed,
@@ -21,7 +21,7 @@ if (!fs::dir_exists(conf$reg_path)) {
 	)
 } else {
 	cli::cli_alert_warning("Loading existing registry at {.file {fs::path_rel(conf$reg_path)}}")
-	reg <- loadRegistry(conf$reg_path, writeable = TRUE)
+	reg = loadRegistry(conf$reg_path, writeable = TRUE)
 }
 
 source(here::here("R/helpers.R"))
@@ -55,7 +55,7 @@ addAlgorithm(name = "MarginalSAGE_sage", fun = algo_MarginalSAGE_sage)
 # Problem Designs
 # ============================================================================
 
-prob_designs <- list(
+prob_designs = list(
 	# Peak: varying dimensions and sample sizes
 	peak = CJ(
 		n_samples = conf$n_samples,
@@ -68,7 +68,7 @@ prob_designs <- list(
 # Algorithm Designs
 # ============================================================================
 
-algo_designs <- list(
+algo_designs = list(
 	# PFI: Permutation Feature Importance
 	PFI = data.table(
 		n_repeats = conf$n_repeats
@@ -174,7 +174,7 @@ for (algo in c("PFI", "CFI", "MarginalSAGE", "ConditionalSAGE")) {
 
 cli::cli_h1("Experiment Summary")
 
-tab <- unwrap(getJobTable())
+tab = unwrap(getJobTable())
 cli::cli_alert_info("Total jobs: {.strong {nrow(tab)}}")
 cli::cli_alert_info("Problems: {.strong {length(prob_designs)}}")
 cli::cli_alert_info("Algorithms: {.strong {length(algo_designs)}}")
@@ -182,7 +182,7 @@ cli::cli_alert_info("Replications: {.strong {conf$repls}}")
 
 # Show job distribution
 cli::cli_h2("Job Distribution by Problem and Algorithm")
-job_dist <- unwrap(tab)[, .N, by = .(problem, algorithm)]
+job_dist = unwrap(tab)[, .N, by = .(problem, algorithm)]
 setorder(job_dist, problem, algorithm)
 print(job_dist)
 

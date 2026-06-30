@@ -4,15 +4,15 @@
 # PFI - Permutation Feature Importance
 # ============================================================================
 
-algo_PFI <- function(data = NULL, job = NULL, instance, n_repeats = 1) {
+algo_PFI = function(data = NULL, job = NULL, instance, n_repeats = 1) {
 	# Create learner for this algorithm
-	learner <- create_learner(
+	learner = create_learner(
 		learner_type = instance$learner_type,
 		task_type = instance$task_type,
 		task = instance$task
 	)
 
-	method <- PFI$new(
+	method = PFI$new(
 		task = instance$task,
 		learner = learner,
 		measure = instance$measure,
@@ -20,9 +20,9 @@ algo_PFI <- function(data = NULL, job = NULL, instance, n_repeats = 1) {
 		n_repeats = n_repeats
 	)
 
-	start_time <- Sys.time()
+	start_time = Sys.time()
 	method$compute()
-	end_time <- Sys.time()
+	end_time = Sys.time()
 
 	data.table::data.table(
 		importance = list(method$importance()),
@@ -40,7 +40,7 @@ algo_PFI <- function(data = NULL, job = NULL, instance, n_repeats = 1) {
 # CFI - Conditional Feature Importance
 # ============================================================================
 
-algo_CFI <- function(
+algo_CFI = function(
 	data = NULL,
 	job = NULL,
 	instance,
@@ -48,16 +48,16 @@ algo_CFI <- function(
 	sampler = "arf"
 ) {
 	# Create learner for this algorithm
-	learner <- create_learner(
+	learner = create_learner(
 		learner_type = instance$learner_type,
 		task_type = instance$task_type,
 		task = instance$task
 	)
 
 	# Create sampler instance
-	sampler_instance <- create_sampler(sampler = sampler, task = instance$task)
+	sampler_instance = create_sampler(sampler = sampler, task = instance$task)
 
-	method <- CFI$new(
+	method = CFI$new(
 		task = instance$task,
 		learner = learner,
 		measure = instance$measure,
@@ -66,9 +66,9 @@ algo_CFI <- function(
 		n_repeats = n_repeats
 	)
 
-	start_time <- Sys.time()
+	start_time = Sys.time()
 	method$compute()
-	end_time <- Sys.time()
+	end_time = Sys.time()
 
 	data.table::data.table(
 		importance = list(method$importance()),
@@ -85,7 +85,7 @@ algo_CFI <- function(
 # MarginalSAGE - Marginal SAGE
 # ============================================================================
 
-algo_MarginalSAGE <- function(
+algo_MarginalSAGE = function(
 	data = NULL,
 	job = NULL,
 	instance,
@@ -96,13 +96,13 @@ algo_MarginalSAGE <- function(
 	min_permutations = 20
 ) {
 	# Create learner for this algorithm
-	learner <- create_learner(
+	learner = create_learner(
 		learner_type = instance$learner_type,
 		task_type = instance$task_type,
 		task = instance$task
 	)
 
-	method <- MarginalSAGE$new(
+	method = MarginalSAGE$new(
 		task = instance$task,
 		learner = learner,
 		measure = instance$measure,
@@ -114,9 +114,9 @@ algo_MarginalSAGE <- function(
 		min_permutations = min_permutations
 	)
 
-	start_time <- Sys.time()
+	start_time = Sys.time()
 	method$compute()
-	end_time <- Sys.time()
+	end_time = Sys.time()
 
 	data.table::data.table(
 		importance = list(method$importance()),
@@ -136,7 +136,7 @@ algo_MarginalSAGE <- function(
 # ConditionalSAGE - Conditional SAGE
 # ============================================================================
 
-algo_ConditionalSAGE <- function(
+algo_ConditionalSAGE = function(
 	data = NULL,
 	job = NULL,
 	instance,
@@ -148,16 +148,16 @@ algo_ConditionalSAGE <- function(
 	min_permutations = 20
 ) {
 	# Create learner for this algorithm
-	learner <- create_learner(
+	learner = create_learner(
 		learner_type = instance$learner_type,
 		task_type = instance$task_type,
 		task = instance$task
 	)
 
 	# Create sampler instance
-	sampler_instance <- create_sampler(sampler = sampler, task = instance$task)
+	sampler_instance = create_sampler(sampler = sampler, task = instance$task)
 
-	method <- ConditionalSAGE$new(
+	method = ConditionalSAGE$new(
 		task = instance$task,
 		learner = learner,
 		measure = instance$measure,
@@ -170,9 +170,9 @@ algo_ConditionalSAGE <- function(
 		min_permutations = min_permutations
 	)
 
-	start_time <- Sys.time()
+	start_time = Sys.time()
 	method$compute()
-	end_time <- Sys.time()
+	end_time = Sys.time()
 
 	data.table::data.table(
 		importance = list(method$importance()),
@@ -191,27 +191,27 @@ algo_ConditionalSAGE <- function(
 # PFI_iml - Reference implementation from iml package
 # ============================================================================
 
-algo_PFI_iml <- function(data = NULL, job = NULL, instance, n_repeats = 1) {
+algo_PFI_iml = function(data = NULL, job = NULL, instance, n_repeats = 1) {
 	require(iml)
 
 	# iml requires a trained model, so we need to train first
 	# Use the first resampling iteration (train/test split)
-	train_ids <- instance$resampling$train_set(1)
-	test_ids <- instance$resampling$test_set(1)
+	train_ids = instance$resampling$train_set(1)
+	test_ids = instance$resampling$test_set(1)
 
 	# Create learner for this algorithm
-	learner <- create_learner(
+	learner = create_learner(
 		learner_type = instance$learner_type,
 		task_type = instance$task_type,
 		task = instance$task
 	)
 
 	# Clone learner to avoid modifying the instance
-	learner_clone <- learner$clone(deep = TRUE)
+	learner_clone = learner$clone(deep = TRUE)
 
 	# Use resample() with the existing resampling to properly handle XGBoost early stopping
 	# This ensures early stopping uses the test set for validation
-	resample_result <- resample(
+	resample_result = resample(
 		instance$task,
 		learner_clone,
 		instance$resampling,
@@ -219,11 +219,11 @@ algo_PFI_iml <- function(data = NULL, job = NULL, instance, n_repeats = 1) {
 	)
 
 	# Extract the trained learner from first iteration (early stopping applied)
-	learner_clone <- resample_result$learners[[1]]
+	learner_clone = resample_result$learners[[1]]
 
 	# Create iml Predictor object
 	# iml expects a predict function that returns predictions
-	predictor <- Predictor$new(
+	predictor = Predictor$new(
 		model = learner_clone,
 		data = instance$task$data(
 			rows = test_ids,
@@ -235,10 +235,10 @@ algo_PFI_iml <- function(data = NULL, job = NULL, instance, n_repeats = 1) {
 		)[[1]],
 		predict.function = function(model, newdata) {
 			# Create temporary task for prediction
-			temp_task <- instance$task$clone()
+			temp_task = instance$task$clone()
 			temp_task$select(colnames(newdata))
 			# Predict and return as vector
-			preds <- model$predict_newdata(newdata, task = temp_task)
+			preds = model$predict_newdata(newdata, task = temp_task)
 			if (instance$task_type == "classif") {
 				# For classification, iml expects probabilities for the positive class
 				# or just the response for binary
@@ -254,22 +254,22 @@ algo_PFI_iml <- function(data = NULL, job = NULL, instance, n_repeats = 1) {
 		.SDcols = mlr3misc::ids(c(instance$measure_eval))
 	]
 
-	start_time <- Sys.time()
+	start_time = Sys.time()
 	# Create FeatureImp object
 	# iml computes importance on initialization
-	imp <- FeatureImp$new(
+	imp = FeatureImp$new(
 		predictor = predictor,
 		loss = ifelse(instance$task_type == "regr", "mse", "ce"),
 		n.repetitions = n_repeats,
 		compare = "difference" # Difference between permuted and original loss (matches xplainfi)
 	)
-	end_time <- Sys.time()
+	end_time = Sys.time()
 
-	imp_results <- imp$results
+	imp_results = imp$results
 
 	# Convert iml results to standard format
 	# iml returns: feature, importance (difference), importance.05, importance.95
-	importance_dt <- data.table::data.table(
+	importance_dt = data.table::data.table(
 		feature = imp_results$feature,
 		importance = imp_results$importance
 	)
@@ -289,27 +289,27 @@ algo_PFI_iml <- function(data = NULL, job = NULL, instance, n_repeats = 1) {
 # PFI_vip - Reference implementation from vip package
 # ============================================================================
 
-algo_PFI_vip <- function(data = NULL, job = NULL, instance, n_repeats = 1) {
+algo_PFI_vip = function(data = NULL, job = NULL, instance, n_repeats = 1) {
 	require(vip)
 
 	# vip requires a trained model, so we need to train first
 	# Use the first resampling iteration (train/test split)
-	train_ids <- instance$resampling$train_set(1)
-	test_ids <- instance$resampling$test_set(1)
+	train_ids = instance$resampling$train_set(1)
+	test_ids = instance$resampling$test_set(1)
 
 	# Create learner for this algorithm
-	learner <- create_learner(
+	learner = create_learner(
 		learner_type = instance$learner_type,
 		task_type = instance$task_type,
 		task = instance$task
 	)
 
 	# Clone learner to avoid modifying the instance
-	learner_clone <- learner$clone(deep = TRUE)
+	learner_clone = learner$clone(deep = TRUE)
 
 	# Use resample() with the existing resampling to properly handle XGBoost early stopping
 	# This ensures early stopping uses the test set for validation
-	resample_result <- resample(
+	resample_result = resample(
 		instance$task,
 		learner_clone,
 		instance$resampling,
@@ -317,27 +317,27 @@ algo_PFI_vip <- function(data = NULL, job = NULL, instance, n_repeats = 1) {
 	)
 
 	# Extract the trained learner from first iteration (early stopping applied)
-	learner_clone <- resample_result$learners[[1]]
+	learner_clone = resample_result$learners[[1]]
 
 	# Prepare data for vip
-	test_data <- instance$task$data(rows = test_ids)
-	target_name <- instance$task$target_names
+	test_data = instance$task$data(rows = test_ids)
+	target_name = instance$task$target_names
 
 	# Determine metric based on task type
 	# Doesn't support MSE accoridng to vip::list_metrics()
-	metric <- if (instance$task_type == "regr") "rmse" else "accuracy"
+	metric = if (instance$task_type == "regr") "rmse" else "accuracy"
 
 	# Create wrapper predict function for vip
 	# vip expects a function(object, newdata) that returns predictions
-	pred_wrapper <- function(object, newdata) {
+	pred_wrapper = function(object, newdata) {
 		# Create temporary task for prediction
-		temp_task <- instance$task$clone()
+		temp_task = instance$task$clone()
 
 		# Predict using predict_newdata_fast if available
 		if (is.function(object$predict_newdata_fast)) {
-			preds <- object$predict_newdata_fast(newdata, task = temp_task)
+			preds = object$predict_newdata_fast(newdata, task = temp_task)
 		} else {
-			preds <- object$predict_newdata(newdata, task = temp_task)
+			preds = object$predict_newdata(newdata, task = temp_task)
 		}
 
 		# For regression, return numeric predictions
@@ -350,11 +350,11 @@ algo_PFI_vip <- function(data = NULL, job = NULL, instance, n_repeats = 1) {
 		.SDcols = mlr3misc::ids(c(instance$measure_eval))
 	]
 
-	start_time <- Sys.time()
+	start_time = Sys.time()
 
 	# Compute permutation importance using vip
 	# vip uses nsim for number of permutations
-	imp_results <- vip::vi(
+	imp_results = vip::vi(
 		object = learner_clone,
 		method = "permute",
 		train = test_data,
@@ -364,11 +364,11 @@ algo_PFI_vip <- function(data = NULL, job = NULL, instance, n_repeats = 1) {
 		pred_wrapper = pred_wrapper
 	)
 
-	end_time <- Sys.time()
+	end_time = Sys.time()
 
 	# Convert vip results to standard format
 	# vip returns: Variable, Importance
-	importance_dt <- data.table::as.data.table(imp_results)
+	importance_dt = data.table::as.data.table(imp_results)
 	data.table::setnames(
 		importance_dt,
 		c("Variable", "Importance"),
@@ -391,13 +391,13 @@ algo_PFI_vip <- function(data = NULL, job = NULL, instance, n_repeats = 1) {
 # PFI_fippy - Reference implementation from fippy package (Python)
 # ============================================================================
 
-algo_PFI_fippy <- function(data = NULL, job = NULL, instance, n_repeats = 1, sampler = "simple") {
+algo_PFI_fippy = function(data = NULL, job = NULL, instance, n_repeats = 1, sampler = "simple") {
 	# Use first resampling iteration
-	train_ids <- instance$resampling$train_set(1)
-	test_ids <- instance$resampling$test_set(1)
+	train_ids = instance$resampling$train_set(1)
+	test_ids = instance$resampling$test_set(1)
 
 	# Convert to sklearn format with pandas DataFrames (fippy samplers need .columns)
-	sklearn_data <- task_to_sklearn(
+	sklearn_data = task_to_sklearn(
 		instance$task,
 		train_ids,
 		test_ids,
@@ -405,7 +405,7 @@ algo_PFI_fippy <- function(data = NULL, job = NULL, instance, n_repeats = 1, sam
 	)
 
 	# Create and train sklearn learner (with encoding if categoricals present)
-	sklearn_learner <- create_sklearn_learner(
+	sklearn_learner = create_sklearn_learner(
 		learner_type = instance$learner_type,
 		task_type = instance$task_type,
 		encode = instance$has_categoricals,
@@ -421,18 +421,18 @@ algo_PFI_fippy <- function(data = NULL, job = NULL, instance, n_repeats = 1, sam
 	)
 
 	# Import fippy and create sampler using helper function
-	fippy <- reticulate::import("fippy")
-	sklearn_metrics <- reticulate::import("sklearn.metrics")
+	fippy = reticulate::import("fippy")
+	sklearn_metrics = reticulate::import("sklearn.metrics")
 
 	# Calculate learner performance on test set
-	test_predictions <- sklearn_learner$predict(sklearn_data$X_test)
-	learner_performance <- if (instance$task_type == "regr") {
+	test_predictions = sklearn_learner$predict(sklearn_data$X_test)
+	learner_performance = if (instance$task_type == "regr") {
 		as.numeric(sklearn_metrics$r2_score(sklearn_data$y_test, test_predictions))
 	} else {
 		as.numeric(sklearn_metrics$accuracy_score(sklearn_data$y_test, test_predictions))
 	}
 
-	sampler_obj <- create_fippy_sampler(
+	sampler_obj = create_fippy_sampler(
 		task = instance$task,
 		X_train_pandas = sklearn_data$X_train,
 		sampler = sampler
@@ -440,39 +440,39 @@ algo_PFI_fippy <- function(data = NULL, job = NULL, instance, n_repeats = 1, sam
 
 	# For regression use MSE, for classification use zero-one loss (classification error)
 	# Note: Using predict (labels) for both, not predict_proba
-	loss_fn <- if (instance$task_type == "regr") {
+	loss_fn = if (instance$task_type == "regr") {
 		sklearn_metrics$mean_squared_error
 	} else {
 		sklearn_metrics$zero_one_loss
 	}
 
 	# Create a wrapper function for the predict method to handle potential conversion issues
-	predict_wrapper <- function(X) {
+	predict_wrapper = function(X) {
 		sklearn_learner$predict(X)
 	}
 
-	explainer <- fippy$Explainer(
+	explainer = fippy$Explainer(
 		predict = predict_wrapper,
 		X_train = sklearn_data$X_train,
 		loss = loss_fn,
 		sampler = sampler_obj
 	)
 
-	start_time <- Sys.time()
+	start_time = Sys.time()
 
 	# Compute PFI using fippy
-	pfi_result <- explainer$pfi(
+	pfi_result = explainer$pfi(
 		X_eval = sklearn_data$X_test,
 		y_eval = sklearn_data$y_test,
 		nr_runs = as.integer(n_repeats)
 	)
 
-	end_time <- Sys.time()
+	end_time = Sys.time()
 
 	# Convert to standard format
 	# fippy returns an explanation object with fi_means_stds() method
-	fi_series <- pfi_result$fi_means_stds()
-	importance_dt <- data.table::data.table(
+	fi_series = pfi_result$fi_means_stds()
+	importance_dt = data.table::data.table(
 		feature = instance$task$feature_names,
 		importance = sapply(instance$task$feature_names, function(f) {
 			as.numeric(fi_series[[f]])
@@ -494,13 +494,13 @@ algo_PFI_fippy <- function(data = NULL, job = NULL, instance, n_repeats = 1, sam
 # CFI_fippy - Conditional Feature Importance from fippy (Python, Gaussian sampler)
 # ============================================================================
 
-algo_CFI_fippy <- function(data = NULL, job = NULL, instance, n_repeats = 1, sampler = "gaussian") {
+algo_CFI_fippy = function(data = NULL, job = NULL, instance, n_repeats = 1, sampler = "gaussian") {
 	# Use first resampling iteration
-	train_ids <- instance$resampling$train_set(1)
-	test_ids <- instance$resampling$test_set(1)
+	train_ids = instance$resampling$train_set(1)
+	test_ids = instance$resampling$test_set(1)
 
 	# Convert to sklearn format with pandas DataFrames (fippy samplers need .columns)
-	sklearn_data <- task_to_sklearn(
+	sklearn_data = task_to_sklearn(
 		instance$task,
 		train_ids,
 		test_ids,
@@ -508,7 +508,7 @@ algo_CFI_fippy <- function(data = NULL, job = NULL, instance, n_repeats = 1, sam
 	)
 
 	# Create and train sklearn learner (with encoding if categoricals present)
-	sklearn_learner <- create_sklearn_learner(
+	sklearn_learner = create_sklearn_learner(
 		learner_type = instance$learner_type,
 		task_type = instance$task_type,
 		encode = instance$has_categoricals,
@@ -524,18 +524,18 @@ algo_CFI_fippy <- function(data = NULL, job = NULL, instance, n_repeats = 1, sam
 	)
 
 	# Import fippy and create sampler using helper function
-	fippy <- reticulate::import("fippy")
-	sklearn_metrics <- reticulate::import("sklearn.metrics")
+	fippy = reticulate::import("fippy")
+	sklearn_metrics = reticulate::import("sklearn.metrics")
 
 	# Calculate learner performance on test set
-	test_predictions <- sklearn_learner$predict(sklearn_data$X_test)
-	learner_performance <- if (instance$task_type == "regr") {
+	test_predictions = sklearn_learner$predict(sklearn_data$X_test)
+	learner_performance = if (instance$task_type == "regr") {
 		as.numeric(sklearn_metrics$r2_score(sklearn_data$y_test, test_predictions))
 	} else {
 		as.numeric(sklearn_metrics$accuracy_score(sklearn_data$y_test, test_predictions))
 	}
 
-	sampler_obj <- create_fippy_sampler(
+	sampler_obj = create_fippy_sampler(
 		task = instance$task,
 		X_train_pandas = sklearn_data$X_train,
 		sampler = sampler
@@ -543,39 +543,39 @@ algo_CFI_fippy <- function(data = NULL, job = NULL, instance, n_repeats = 1, sam
 
 	# For regression use MSE, for classification use zero-one loss (classification error)
 	# Note: Using predict (labels) for both, not predict_proba
-	loss_fn <- if (instance$task_type == "regr") {
+	loss_fn = if (instance$task_type == "regr") {
 		sklearn_metrics$mean_squared_error
 	} else {
 		sklearn_metrics$zero_one_loss
 	}
 
 	# Create a wrapper function for the predict method to handle potential conversion issues
-	predict_wrapper <- function(X) {
+	predict_wrapper = function(X) {
 		sklearn_learner$predict(X)
 	}
 
-	explainer <- fippy$Explainer(
+	explainer = fippy$Explainer(
 		predict = predict_wrapper,
 		X_train = sklearn_data$X_train,
 		loss = loss_fn,
 		sampler = sampler_obj
 	)
 
-	start_time <- Sys.time()
+	start_time = Sys.time()
 
 	# Compute CFI using fippy
-	cfi_result <- explainer$cfi(
+	cfi_result = explainer$cfi(
 		X_eval = sklearn_data$X_test,
 		y_eval = sklearn_data$y_test,
 		nr_runs = as.integer(n_repeats)
 	)
 
-	end_time <- Sys.time()
+	end_time = Sys.time()
 
 	# Convert to standard format
 	# fippy returns an explanation object with fi_means_stds() method
-	fi_series <- cfi_result$fi_means_stds()
-	importance_dt <- data.table::data.table(
+	fi_series = cfi_result$fi_means_stds()
+	importance_dt = data.table::data.table(
 		feature = instance$task$feature_names,
 		importance = sapply(instance$task$feature_names, function(f) {
 			as.numeric(fi_series[[f]])
@@ -597,7 +597,7 @@ algo_CFI_fippy <- function(data = NULL, job = NULL, instance, n_repeats = 1, sam
 # MarginalSAGE_fippy - Marginal SAGE from fippy package (Python)
 # ============================================================================
 
-algo_MarginalSAGE_fippy <- function(
+algo_MarginalSAGE_fippy = function(
 	data = NULL,
 	job = NULL,
 	instance,
@@ -608,14 +608,14 @@ algo_MarginalSAGE_fippy <- function(
 	min_permutations = 20
 ) {
 	# Use first resampling iteration
-	train_ids <- instance$resampling$train_set(1)
-	test_ids <- instance$resampling$test_set(1)
+	train_ids = instance$resampling$train_set(1)
+	test_ids = instance$resampling$test_set(1)
 
 	# Ensure Python packages (including pandas) are available before data conversion
 	.ensure_python_packages()
 
 	# Convert to sklearn format with pandas DataFrames (fippy samplers need .columns)
-	sklearn_data <- task_to_sklearn(
+	sklearn_data = task_to_sklearn(
 		instance$task,
 		train_ids,
 		test_ids,
@@ -623,7 +623,7 @@ algo_MarginalSAGE_fippy <- function(
 	)
 
 	# Create and train sklearn learner (with encoding if categoricals present)
-	sklearn_learner <- create_sklearn_learner(
+	sklearn_learner = create_sklearn_learner(
 		learner_type = instance$learner_type,
 		task_type = instance$task_type,
 		encode = instance$has_categoricals,
@@ -639,43 +639,43 @@ algo_MarginalSAGE_fippy <- function(
 	)
 
 	# Import fippy and create sampler using helper function
-	fippy <- reticulate::import("fippy")
-	sklearn_metrics <- reticulate::import("sklearn.metrics")
+	fippy = reticulate::import("fippy")
+	sklearn_metrics = reticulate::import("sklearn.metrics")
 
 	# Calculate learner performance on test set
-	test_predictions <- sklearn_learner$predict(sklearn_data$X_test)
-	learner_performance <- if (instance$task_type == "regr") {
+	test_predictions = sklearn_learner$predict(sklearn_data$X_test)
+	learner_performance = if (instance$task_type == "regr") {
 		as.numeric(sklearn_metrics$r2_score(sklearn_data$y_test, test_predictions))
 	} else {
 		as.numeric(sklearn_metrics$accuracy_score(sklearn_data$y_test, test_predictions))
 	}
 
-	sampler_obj <- create_fippy_sampler(
+	sampler_obj = create_fippy_sampler(
 		task = instance$task,
 		X_train_pandas = sklearn_data$X_train,
 		sampler = sampler
 	)
 	# For regression use MSE, for classification use zero-one loss (classification error)
 	# Note: Using predict (labels) for both, not predict_proba
-	loss_fn <- if (instance$task_type == "regr") {
+	loss_fn = if (instance$task_type == "regr") {
 		sklearn_metrics$mean_squared_error
 	} else {
 		sklearn_metrics$zero_one_loss
 	}
 
 	# Create a wrapper function for the predict method to handle potential conversion issues
-	predict_wrapper <- function(X) {
+	predict_wrapper = function(X) {
 		sklearn_learner$predict(X)
 	}
 
-	explainer <- fippy$Explainer(
+	explainer = fippy$Explainer(
 		predict = predict_wrapper,
 		X_train = sklearn_data$X_train,
 		loss = loss_fn,
 		sampler = sampler_obj
 	)
 
-	start_time <- Sys.time()
+	start_time = Sys.time()
 
 	# Compute Marginal SAGE using fippy
 	# nr_orderings: number of permutation orderings (like n_permutations in xplainfi)
@@ -683,7 +683,7 @@ algo_MarginalSAGE_fippy <- function(
 	# nr_resample_marginalize: number of samples for Monte Carlo integration (like n_samples in xplainfi)
 	# detect_convergence: use convergence detection for optimal results (matches KernelSAGE approach)
 	# Returns tuple (explanation, orderings) - we only need explanation
-	sage_result <- explainer$msage(
+	sage_result = explainer$msage(
 		X_eval = sklearn_data$X_test,
 		y_eval = sklearn_data$y_test,
 		nr_orderings = as.integer(n_permutations),
@@ -695,15 +695,15 @@ algo_MarginalSAGE_fippy <- function(
 		extra_orderings = min_permutations
 	)
 
-	end_time <- Sys.time()
+	end_time = Sys.time()
 
 	# Extract explanation object (first element of tuple) and orderings (second element)
-	explanation <- sage_result[[1]]
-	orderings <- sage_result[[2]]
-	n_permutations_used <- nrow(orderings)
+	explanation = sage_result[[1]]
+	orderings = sage_result[[2]]
+	n_permutations_used = nrow(orderings)
 
-	fi_series <- explanation$fi_means_stds()
-	importance_dt <- data.table::data.table(
+	fi_series = explanation$fi_means_stds()
+	importance_dt = data.table::data.table(
 		feature = instance$task$feature_names,
 		importance = sapply(instance$task$feature_names, function(f) {
 			as.numeric(fi_series[[f]])
@@ -727,7 +727,7 @@ algo_MarginalSAGE_fippy <- function(
 # ConditionalSAGE_fippy - Conditional SAGE from fippy package (Python)
 # ============================================================================
 
-algo_ConditionalSAGE_fippy <- function(
+algo_ConditionalSAGE_fippy = function(
 	data = NULL,
 	job = NULL,
 	instance,
@@ -738,14 +738,14 @@ algo_ConditionalSAGE_fippy <- function(
 	min_permutations = 20
 ) {
 	# Use first resampling iteration
-	train_ids <- instance$resampling$train_set(1)
-	test_ids <- instance$resampling$test_set(1)
+	train_ids = instance$resampling$train_set(1)
+	test_ids = instance$resampling$test_set(1)
 
 	# Ensure Python packages (including pandas) are available before data conversion
 	.ensure_python_packages()
 
 	# Convert to sklearn format with pandas DataFrames (fippy samplers need .columns)
-	sklearn_data <- task_to_sklearn(
+	sklearn_data = task_to_sklearn(
 		instance$task,
 		train_ids,
 		test_ids,
@@ -753,7 +753,7 @@ algo_ConditionalSAGE_fippy <- function(
 	)
 
 	# Create and train sklearn learner (with encoding if categoricals present)
-	sklearn_learner <- create_sklearn_learner(
+	sklearn_learner = create_sklearn_learner(
 		learner_type = instance$learner_type,
 		task_type = instance$task_type,
 		encode = instance$has_categoricals,
@@ -769,18 +769,18 @@ algo_ConditionalSAGE_fippy <- function(
 	)
 
 	# Import fippy and create sampler using helper function
-	fippy <- reticulate::import("fippy")
-	sklearn_metrics <- reticulate::import("sklearn.metrics")
+	fippy = reticulate::import("fippy")
+	sklearn_metrics = reticulate::import("sklearn.metrics")
 
 	# Calculate learner performance on test set
-	test_predictions <- sklearn_learner$predict(sklearn_data$X_test)
-	learner_performance <- if (instance$task_type == "regr") {
+	test_predictions = sklearn_learner$predict(sklearn_data$X_test)
+	learner_performance = if (instance$task_type == "regr") {
 		as.numeric(sklearn_metrics$r2_score(sklearn_data$y_test, test_predictions))
 	} else {
 		as.numeric(sklearn_metrics$accuracy_score(sklearn_data$y_test, test_predictions))
 	}
 
-	sampler_obj <- create_fippy_sampler(
+	sampler_obj = create_fippy_sampler(
 		task = instance$task,
 		X_train_pandas = sklearn_data$X_train,
 		sampler = sampler
@@ -788,25 +788,25 @@ algo_ConditionalSAGE_fippy <- function(
 
 	# For regression use MSE, for classification use zero-one loss (classification error)
 	# Note: Using predict (labels) for both, not predict_proba
-	loss_fn <- if (instance$task_type == "regr") {
+	loss_fn = if (instance$task_type == "regr") {
 		sklearn_metrics$mean_squared_error
 	} else {
 		sklearn_metrics$zero_one_loss
 	}
 
 	# Create a wrapper function for the predict method to handle potential conversion issues
-	predict_wrapper <- function(X) {
+	predict_wrapper = function(X) {
 		sklearn_learner$predict(X)
 	}
 
-	explainer <- fippy$Explainer(
+	explainer = fippy$Explainer(
 		predict = predict_wrapper,
 		X_train = sklearn_data$X_train,
 		loss = loss_fn,
 		sampler = sampler_obj
 	)
 
-	start_time <- Sys.time()
+	start_time = Sys.time()
 
 	# Compute Conditional SAGE using fippy
 	# nr_orderings: number of permutation orderings (like n_permutations in xplainfi)
@@ -815,7 +815,7 @@ algo_ConditionalSAGE_fippy <- function(
 	# detect_convergence: use convergence detection for optimal results (matches KernelSAGE approach)
 	# Returns tuple (explanation, orderings)
 	# orderings is a table
-	sage_result <- explainer$csage(
+	sage_result = explainer$csage(
 		X_eval = sklearn_data$X_test,
 		y_eval = sklearn_data$y_test,
 		nr_orderings = as.integer(n_permutations),
@@ -827,15 +827,15 @@ algo_ConditionalSAGE_fippy <- function(
 		extra_orderings = min_permutations
 	)
 
-	end_time <- Sys.time()
+	end_time = Sys.time()
 
 	# Extract explanation object (first element of tuple) and orderings (second element)
-	explanation <- sage_result[[1]]
-	orderings <- sage_result[[2]]
-	n_permutations_used <- nrow(orderings)
+	explanation = sage_result[[1]]
+	orderings = sage_result[[2]]
+	n_permutations_used = nrow(orderings)
 
-	fi_series <- explanation$fi_means_stds()
-	importance_dt <- data.table::data.table(
+	fi_series = explanation$fi_means_stds()
+	importance_dt = data.table::data.table(
 		feature = instance$task$feature_names,
 		importance = sapply(instance$task$feature_names, function(f) {
 			as.numeric(fi_series[[f]])
@@ -859,7 +859,7 @@ algo_ConditionalSAGE_fippy <- function(
 # MarginalSAGE_sage - Official SAGE implementation with kernel estimator -> KernelSAGE
 # ============================================================================
 
-algo_MarginalSAGE_sage <- function(
+algo_MarginalSAGE_sage = function(
 	data = NULL,
 	job = NULL,
 	instance,
@@ -868,11 +868,11 @@ algo_MarginalSAGE_sage <- function(
 	min_permutations = 20
 ) {
 	# Use first resampling iteration
-	train_ids <- instance$resampling$train_set(1)
-	test_ids <- instance$resampling$test_set(1)
+	train_ids = instance$resampling$train_set(1)
+	test_ids = instance$resampling$test_set(1)
 
 	# Convert to sklearn format (no special handling needed with numeric-only features)
-	sklearn_data <- task_to_sklearn(
+	sklearn_data = task_to_sklearn(
 		instance$task,
 		train_ids,
 		test_ids,
@@ -880,7 +880,7 @@ algo_MarginalSAGE_sage <- function(
 	)
 
 	# Create and train sklearn learner
-	sklearn_learner <- create_sklearn_learner(
+	sklearn_learner = create_sklearn_learner(
 		learner_type = instance$learner_type,
 		task_type = instance$task_type,
 		encode = instance$has_categoricals, # Will be FALSE with convert_to_numeric = TRUE
@@ -896,53 +896,53 @@ algo_MarginalSAGE_sage <- function(
 	)
 
 	# Calculate learner performance on test set
-	sklearn_metrics <- reticulate::import("sklearn.metrics")
-	test_predictions <- sklearn_learner$predict(sklearn_data$X_test)
-	learner_performance <- if (instance$task_type == "regr") {
+	sklearn_metrics = reticulate::import("sklearn.metrics")
+	test_predictions = sklearn_learner$predict(sklearn_data$X_test)
+	learner_performance = if (instance$task_type == "regr") {
 		as.numeric(sklearn_metrics$r2_score(sklearn_data$y_test, test_predictions))
 	} else {
 		as.numeric(sklearn_metrics$accuracy_score(sklearn_data$y_test, test_predictions))
 	}
 
 	# Import sage and create MarginalImputer + KernelEstimator
-	sage <- reticulate::import("sage")
+	sage = reticulate::import("sage")
 
 	# Use training data as background data for marginalization
 	# Limit to sage_n_samples to control computation
-	n_background <- min(sage_n_samples, nrow(sklearn_data$X_train))
-	background_data <- sklearn_data$X_train[1:n_background, , drop = FALSE]
+	n_background = min(sage_n_samples, nrow(sklearn_data$X_train))
+	background_data = sklearn_data$X_train[1:n_background, , drop = FALSE]
 
 	# Create imputer (simple since no encoding pipeline needed)
-	imputer <- sage$MarginalImputer(
+	imputer = sage$MarginalImputer(
 		model = sklearn_learner,
 		data = background_data
 	)
 
 	# Create KernelEstimator
-	loss <- if (instance$task_type == "regr") "mse" else "cross entropy"
+	loss = if (instance$task_type == "regr") "mse" else "cross entropy"
 
 	# Handle random_state
-	random_state <- job$seed
+	random_state = job$seed
 	if (is.null(random_state)) {
 		cli::cli_alert_info("{.code random_state} not specified, using constant seed")
-		random_state <- 2093564L
+		random_state = 2093564L
 	}
 
-	estimator <- sage$KernelEstimator(
+	estimator = sage$KernelEstimator(
 		imputer = imputer,
 		loss = loss,
 		random_state = as.integer(random_state)
 	)
 
-	start_time <- Sys.time()
+	start_time = Sys.time()
 
 	# Compute SAGE values with convergence detection
 	# Note: Featureless learners are excluded from KernelSAGE in experiment setup
 	# to avoid indefinite convergence loops
 	# Convert to numpy arrays explicitly to avoid shape attribute errors
-	np <- reticulate::import("numpy", convert = FALSE)
+	np = reticulate::import("numpy", convert = FALSE)
 
-	explanation <- estimator(
+	explanation = estimator(
 		X = np$array(sklearn_data$X_test),
 		Y = np$array(sklearn_data$y_test),
 		detect_convergence = early_stopping,
@@ -950,11 +950,11 @@ algo_MarginalSAGE_sage <- function(
 		bar = FALSE
 	)
 
-	end_time <- Sys.time()
+	end_time = Sys.time()
 
 	# Extract SAGE values from explanation object
 	# explanation$values is a numpy array with shape (n_features,)
-	importance_dt <- data.table::data.table(
+	importance_dt = data.table::data.table(
 		feature = instance$task$feature_names,
 		importance = as.numeric(explanation$values)
 	)

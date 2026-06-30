@@ -1,4 +1,4 @@
-.ensure_torch <- function() {
+.ensure_torch = function() {
 	if (requireNamespace("torch", quietly = TRUE)) {
 		if (!torch::torch_is_installed()) {
 			cli::cli_warn(c(
@@ -10,7 +10,7 @@
 }
 
 # Helper function to create resampling strategy
-create_resampling <- function(
+create_resampling = function(
 	type = "holdout",
 	ratio = 2 / 3,
 	folds = 3,
@@ -28,12 +28,12 @@ create_resampling <- function(
 # Ensures that:
 # - Same task + same replication = same splits (for fair method comparison)
 # - Same task + different replication = different splits (for independent runs)
-instantiate_resampling <- function(resampling, task, replication = 1) {
+instantiate_resampling = function(resampling, task, replication = 1) {
 	# Generate task-specific seed from hash using digest
-	task_seed <- digest::digest2int(task$hash)
+	task_seed = digest::digest2int(task$hash)
 
 	# Combine with replication number for variation across replications
-	combined_seed <- task_seed + replication
+	combined_seed = task_seed + replication
 
 	withr::with_seed(combined_seed, {
 		resampling$instantiate(task)
@@ -43,7 +43,7 @@ instantiate_resampling <- function(resampling, task, replication = 1) {
 }
 
 # Helper function to create learner
-create_learner <- function(
+create_learner = function(
 	learner_type = c("rf", "linear", "featureless", "mlp", "boosting"),
 	n_trees = 500,
 	n_units = 20,
@@ -52,11 +52,11 @@ create_learner <- function(
 ) {
 	requireNamespace("mlr3learners", quietly = TRUE)
 	require("mlr3pipelines")
-	learner_type <- match.arg(learner_type)
-	task_type <- match.arg(task_type)
-	needs_encoding <- any(task$feature_types$type %in% c("factor", "character"))
+	learner_type = match.arg(learner_type)
+	task_type = match.arg(task_type)
+	needs_encoding = any(task$feature_types$type %in% c("factor", "character"))
 
-	base_learner <- switch(
+	base_learner = switch(
 		learner_type,
 		"featureless" = {
 			lrn(paste(task_type, "featureless", sep = "."))
@@ -70,7 +70,7 @@ create_learner <- function(
 		"mlp" = {
 			.ensure_torch()
 			require(mlr3torch)
-			base_learner <- lrn(
+			base_learner = lrn(
 				paste(task_type, "mlp", sep = "."),
 				# architecture parameters
 				neurons = n_units,
@@ -88,7 +88,7 @@ create_learner <- function(
 			)
 			# Add encoding, sadly makes predict_newdata_fast impossible
 			if (needs_encoding) {
-				base_learner <- po("encode", method = "one-hot") %>>%
+				base_learner = po("encode", method = "one-hot") %>>%
 					base_learner |>
 					as_learner()
 			}
@@ -104,7 +104,7 @@ create_learner <- function(
 			# )
 		},
 		"boosting" = {
-			base_learner <- lrn(
+			base_learner = lrn(
 				paste(task_type, "xgboost", sep = "."),
 				nrounds = 1000,
 				early_stopping_rounds = 50,
@@ -129,7 +129,7 @@ create_learner <- function(
 }
 
 # Helper function to create measure
-create_measure <- function(task_type = "regr") {
+create_measure = function(task_type = "regr") {
 	importance = switch(
 		task_type,
 		"regr" = mlr3::msr("regr.mse"),
@@ -144,11 +144,11 @@ create_measure <- function(task_type = "regr") {
 }
 
 # Helper function to create conditional sampler
-create_sampler <- function(
+create_sampler = function(
 	sampler = c("arf", "gaussian", "knn", "ctree"),
 	task
 ) {
-	sampler <- match.arg(sampler)
+	sampler = match.arg(sampler)
 
 	switch(
 		sampler,
@@ -167,7 +167,7 @@ create_sampler <- function(
 
 # Helper function to create complete problem instance
 # Wraps common logic for all problems: creating learner, measure, resampling
-create_problem_instance <- function(
+create_problem_instance = function(
 	task,
 	job = NULL,
 	learner_type,
@@ -176,12 +176,12 @@ create_problem_instance <- function(
 	has_categoricals = FALSE,
 	...
 ) {
-	task_type <- task$task_type
+	task_type = task$task_type
 
 	# Create measure
-	measures <- create_measure(task_type = task_type)
+	measures = create_measure(task_type = task_type)
 	# Create and instantiate resampling
-	resampling <- create_resampling(type = resampling_type)
+	resampling = create_resampling(type = resampling_type)
 	instantiate_resampling(resampling, task, job$repl %||% 1)
 
 	# Return instance with metadata - no learner created here!

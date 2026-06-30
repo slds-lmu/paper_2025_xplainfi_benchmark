@@ -9,9 +9,9 @@
 #' cells with a single run -- i.e. all other methods/packages -- are returned unchanged.
 #' Safe to call on already-deduplicated data (it is then a no-op).
 #' @param importances data.table with a `job.id` column and experiment identifiers.
-dedup_latest_run <- function(importances) {
-	importances <- data.table::as.data.table(importances)
-	cell_keys <- intersect(
+dedup_latest_run = function(importances) {
+	importances = data.table::as.data.table(importances)
+	cell_keys = intersect(
 		c("problem", "method", "package", "learner_type", "feature", "repl", "correlation"),
 		names(importances)
 	)
@@ -24,10 +24,10 @@ dedup_latest_run <- function(importances) {
 
 #' Aggregate results from batchtools registry
 #' @param results Result table as returned by reduceResultsDataTable(). Read from `here::here("results", "importance", "results.rds")` if NULL.
-clean_results_importance <- function(results, job_pars) {
-	tmpres <- data.table::rbindlist(results$result, fill = TRUE)
-	tmpres <- cbind(results[, .(job.id)], tmpres)
-	res <- ijoin(
+clean_results_importance = function(results, job_pars) {
+	tmpres = data.table::rbindlist(results$result, fill = TRUE)
+	tmpres = cbind(results[, .(job.id)], tmpres)
+	res = ijoin(
 		tmpres,
 		job_pars[, .(
 			job.id,
@@ -111,21 +111,21 @@ clean_results_importance <- function(results, job_pars) {
 	# res |> dplyr::count(algorithm, method, package, sampler)
 
 	# Extract importances
-	importances <- rbindlist(
+	importances = rbindlist(
 		lapply(results$job.id, \(x) {
-			importances <- results[job.id == x, result[[1]]$importance]
+			importances = results[job.id == x, result[[1]]$importance]
 			importances[, job.id := x]
 		}),
 		fill = TRUE
 	)
 	# Add job parameters (algorithm, problem parameters, ...)
-	importances <- merge(res[, -"importance"], importances, by = "job.id")
+	importances = merge(res[, -"importance"], importances, by = "job.id")
 
 	# The registry contains an earlier SAGE run (min_permutations = NA) superseded by
 	# the current one (min_permutations = 20), so those cells have two jobs. Keep the
 	# newest run (largest job.id) per experiment cell; cells with a single job (all
 	# other methods/packages) are unaffected.
-	importances <- dedup_latest_run(importances)
+	importances = dedup_latest_run(importances)
 
 	importances[, language := fifelse(package %in% c("fippy", "sage"), "Python", "R")]
 	importances[,
@@ -154,12 +154,12 @@ clean_results_importance <- function(results, job_pars) {
 
 # Runtime ----------------------------------------------------------------
 
-clean_results_runtime <- function(results, job_pars) {
-	tmpres <- data.table::rbindlist(results$result, fill = TRUE)
-	tmpres <- cbind(results[, .(job.id)], tmpres)
+clean_results_runtime = function(results, job_pars) {
+	tmpres = data.table::rbindlist(results$result, fill = TRUE)
+	tmpres = cbind(results[, .(job.id)], tmpres)
 	tmpres[, scores := NULL]
 
-	res <- ijoin(
+	res = ijoin(
 		tmpres,
 		job_pars[, .(
 			job.id,

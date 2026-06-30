@@ -1,6 +1,6 @@
 # Configuration file for batchtools experiment
 # Experiment settings
-conf <- list(
+conf = list(
 	# General batchtools settings
 	reg_path = here::here("registries", "runtime"),
 	seed = 2025,

@@ -1,5 +1,5 @@
 # Configuration file for batchtools experiment / importance sub-benchmark
-conf <- list(
+conf = list(
 	# General batchtools settings
 	reg_path = here::here("registries", "importance"),
 	seed = 2025,

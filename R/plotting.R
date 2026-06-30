@@ -1,5 +1,5 @@
 # https://coolors.co/1e3888-ef476f-f5e663-ffad69-9c3848
-pal_package <- c(
+pal_package = c(
 	xplainfi = "#1e3888",
 	fippy = "#8CD867",
 	vip = "#A31621",
@@ -17,7 +17,7 @@ pal_package <- c(
 #' @param facets character(): `learner_type` Variable name(s) to facet by via `ggplot2::facet_wrap()`.
 #' @param ncol,nrow integer(1) passed to `facet_wrap()`.
 #' @param subtitle,caption logical(1): `TRUE` Toggle subtitle (showing method label) or caption (showing learner_type).
-plot_importance <- function(
+plot_importance = function(
 	importances,
 	type = c("scaled", "raw", "rank"),
 	y_var = "feature",
@@ -44,22 +44,22 @@ plot_importance <- function(
 	)
 	checkmate::assert_subset(color, names(importances))
 	checkmate::assert_subset(facets, names(importances))
-	type <- match.arg(type)
-	feature_sort <- match.arg(feature_sort)
+	type = match.arg(type)
+	feature_sort = match.arg(feature_sort)
 
-	target_var <- switch(
+	target_var = switch(
 		type,
 		raw = "importance",
 		scaled = "importance_scaled",
 		rank = "importance_rank"
 	)
 
-	problem <- problem %||% unique(importances$problem)
-	method <- method %||% unique(importances$method)
-	learner_type <- learner_type %||% unique(importances$learner_type)
-	feature <- feature %||% unique(importances$feature)
+	problem = problem %||% unique(importances$problem)
+	method = method %||% unique(importances$method)
+	learner_type = learner_type %||% unique(importances$learner_type)
+	feature = feature %||% unique(importances$feature)
 
-	importance_subset <- importances |>
+	importance_subset = importances |>
 		dplyr::filter(
 			.data[["problem"]] %in% .env[["problem"]],
 			.data[["method"]] %in% .env[["method"]],
@@ -68,16 +68,16 @@ plot_importance <- function(
 		)
 
 	if ("correlated" %in% problem) {
-		problem[problem == "correlated"] <- sprintf(
+		problem[problem == "correlated"] = sprintf(
 			"%s (r=%s)",
 			problem,
 			paste0(unique(importances$correlation), collapse = ", ")
 		)
 	}
 
-	problem_lab <- glue::glue_collapse(problem, sep = ", ", last = ", and ")
-	method_lab <- glue::glue_collapse(method, sep = ", ", last = ", and ")
-	learner_type_lab <- glue::glue_collapse(
+	problem_lab = glue::glue_collapse(problem, sep = ", ", last = ", and ")
+	method_lab = glue::glue_collapse(method, sep = ", ", last = ", and ")
+	learner_type_lab = glue::glue_collapse(
 		learner_type,
 		sep = ", ",
 		last = ", and "
@@ -87,22 +87,22 @@ plot_importance <- function(
 	# cli::cli_alert_info("Method = {.val {method}}")
 	# cli::cli_alert_info("Learner = {.val {learner_type}}")
 
-	title_lab <- NULL
+	title_lab = NULL
 	if (title && !is.null(problem)) {
-		title_lab <- glue::glue("Problem: {problem_lab}")
+		title_lab = glue::glue("Problem: {problem_lab}")
 	}
 
-	subtitle_lab <- NULL
+	subtitle_lab = NULL
 	if (subtitle && !is.null(method)) {
-		subtitle_lab <- glue::glue("Method: {method_lab}")
+		subtitle_lab = glue::glue("Method: {method_lab}")
 	}
-	caption_lab <- NULL
+	caption_lab = NULL
 	if (caption && !is.null(learner_type)) {
 		glue::glue("Learner: {learner_type_lab}")
 	}
 
-	x_lab <- "Importance"
-	x_lab <- switch(
+	x_lab = "Importance"
+	x_lab = switch(
 		type,
 		scaled = paste0(x_lab, " (scaled, %)"),
 		rank = paste0(x_lab, " (ranks)"),
@@ -110,14 +110,14 @@ plot_importance <- function(
 	)
 
 	if (feature_sort == "importance") {
-		importance_subset <- importance_subset |>
+		importance_subset = importance_subset |>
 			dplyr::mutate(feature = forcats::fct_reorder(feature, importance))
 	} else if (feature_sort == "name") {
-		importance_subset <- importance_subset |>
+		importance_subset = importance_subset |>
 			dplyr::mutate(feature = forcats::fct_rev(feature))
 	}
 
-	p <- importance_subset |>
+	p = importance_subset |>
 		ggplot(aes(
 			x = .data[[target_var]],
 			y = .data[[y_var]],
@@ -139,25 +139,25 @@ plot_importance <- function(
 
 	if (type == "scaled") {
 		# p <- p + scale_x_continuous(labels = scales::label_percent())
-		p <- p + scale_x_continuous(labels = scales::label_percent(suffix = ""))
+		p = p + scale_x_continuous(labels = scales::label_percent(suffix = ""))
 	}
 
 	if (!is.null(color)) {
 		if (color == "package") {
-			p <- p +
+			p = p +
 				scale_fill_manual(values = pal_package, aesthetics = c("color", "fill"))
 		} else {
 			if (length(unique(importances[[color]])) <= 5) {
-				p <- p +
+				p = p +
 					scale_fill_brewer(palette = "Dark2", aesthetics = c("fill", "color"))
 			} else {
-				p <- p + scale_fill_viridis_d(aesthetics = c("fill", "color"))
+				p = p + scale_fill_viridis_d(aesthetics = c("fill", "color"))
 			}
 		}
 	}
 
 	if (length(facets) > 0) {
-		p <- p +
+		p = p +
 			facet_wrap(
 				facets = facets,
 				dir = "h",
@@ -192,7 +192,7 @@ plot_importance <- function(
 #' @param feature_sort One of `"importance"` (order by spread of differences) or `"name"`.
 #' @param multi_line logical(1) passed to the facet labeller.
 #' @param base_size numeric(1) Base font size for theme.
-plot_importance_diff <- function(
+plot_importance_diff = function(
 	importances,
 	type = c("scaled", "raw"),
 	problem = NULL,
@@ -215,19 +215,19 @@ plot_importance_diff <- function(
 		learner_type,
 		as.character(unique(importances$learner_type))
 	)
-	type <- match.arg(type)
-	feature_sort <- match.arg(feature_sort)
-	value_col <- switch(type, scaled = "importance_scaled", raw = "importance")
+	type = match.arg(type)
+	feature_sort = match.arg(feature_sort)
+	value_col = switch(type, scaled = "importance_scaled", raw = "importance")
 
-	dat <- data.table::as.data.table(importances)
+	dat = data.table::as.data.table(importances)
 
-	sel_problem <- problem %||% unique(as.character(dat$problem))
-	sel_method <- method %||% unique(as.character(dat$method))
-	sel_learner <- learner_type %||% unique(as.character(dat$learner_type))
-	sel_feature <- feature %||% unique(as.character(dat$feature))
-	sel_exclude <- exclude_packages
+	sel_problem = problem %||% unique(as.character(dat$problem))
+	sel_method = method %||% unique(as.character(dat$method))
+	sel_learner = learner_type %||% unique(as.character(dat$learner_type))
+	sel_feature = feature %||% unique(as.character(dat$feature))
+	sel_exclude = exclude_packages
 
-	dat <- dat[
+	dat = dat[
 		as.character(problem) %in%
 			sel_problem &
 			as.character(method) %in% sel_method &
@@ -236,18 +236,18 @@ plot_importance_diff <- function(
 			!(as.character(package) %in% sel_exclude)
 	]
 
-	key <- intersect(
+	key = intersect(
 		c("problem", "method", "learner_type", "feature", "repl", "correlation"),
 		names(dat)
 	)
 
 	# Collapse any duplicate measurements per cell + package to a single value
-	dat <- dat[,
+	dat = dat[,
 		.(value = mean(get(value_col), na.rm = TRUE)),
 		by = c(key, "package")
 	]
 
-	wide <- data.table::dcast(
+	wide = data.table::dcast(
 		dat,
 		stats::as.formula(paste(paste(key, collapse = " + "), "~ package")),
 		value.var = "value"
@@ -256,14 +256,14 @@ plot_importance_diff <- function(
 	if (!baseline %in% names(wide)) {
 		stop("Baseline package '", baseline, "' not present in the data.")
 	}
-	refs <- setdiff(unique(as.character(dat$package)), baseline)
+	refs = setdiff(unique(as.character(dat$package)), baseline)
 
-	diff_long <- data.table::rbindlist(lapply(refs, function(pkg) {
-		w <- wide[!is.na(get(baseline)) & !is.na(get(pkg))]
+	diff_long = data.table::rbindlist(lapply(refs, function(pkg) {
+		w = wide[!is.na(get(baseline)) & !is.na(get(pkg))]
 		if (!nrow(w)) {
 			return(NULL)
 		}
-		out <- w[, ..key]
+		out = w[, ..key]
 		out[, package := pkg]
 		out[, diff := w[[baseline]] - w[[pkg]]]
 		out[]
@@ -282,19 +282,19 @@ plot_importance_diff <- function(
 		diff_long[, feature := forcats::fct_rev(factor(feature))]
 	}
 
-	title_lab <- NULL
+	title_lab = NULL
 	if (title) {
-		problem_lab <- glue::glue_collapse(problem, sep = ", ", last = ", and ")
-		title_lab <- glue::glue("Problem: {problem_lab}")
+		problem_lab = glue::glue_collapse(problem, sep = ", ", last = ", and ")
+		title_lab = glue::glue("Problem: {problem_lab}")
 	}
 
-	x_lab <- switch(
+	x_lab = switch(
 		type,
 		scaled = glue::glue("Scaled importance difference ({baseline} − reference, %)"),
 		raw = glue::glue("Raw importance difference ({baseline} − reference)")
 	)
 
-	p <- ggplot(
+	p = ggplot(
 		diff_long,
 		aes(x = diff, y = feature, color = package, fill = package)
 	) +
@@ -313,11 +313,11 @@ plot_importance_diff <- function(
 
 	if (type == "scaled") {
 		# Scaled importances live in [0, 1]; show differences as percentage points
-		p <- p + scale_x_continuous(labels = scales::label_percent(suffix = ""))
+		p = p + scale_x_continuous(labels = scales::label_percent(suffix = ""))
 	}
 
 	if (length(facets) > 0) {
-		p <- p +
+		p = p +
 			facet_wrap(
 				facets = facets,
 				dir = "h",
@@ -347,7 +347,7 @@ plot_importance_diff <- function(
 #' @param show_legend logical(1) Whether to show the legend.
 #' @param base_size numeric(1) Base font size for theme.
 #' @return A ggplot2 object.
-plot_runtime <- function(
+plot_runtime = function(
 	runtimes,
 	scale = c("seconds", "relative"),
 	method = NULL,
@@ -367,20 +367,20 @@ plot_runtime <- function(
 	show_legend = TRUE,
 	base_size = 16
 ) {
-	scale <- match.arg(scale)
-	data <- data.table::copy(runtimes)
+	scale = match.arg(scale)
+	data = data.table::copy(runtimes)
 
 	# Apply filters using dplyr::filter with .data/.env pronouns (like plot_importance)
-	method <- method %||% unique(data$method)
-	package <- package %||% unique(data$package)
-	learner_type <- learner_type %||% unique(data$learner_type)
-	sampler <- sampler %||% unique(data$sampler)
-	n_samples <- n_samples %||% unique(data$n_samples)
-	n_features <- n_features %||% unique(data$n_features)
-	n_permutations <- n_permutations %||% unique(data$n_permutations)
-	sage_n_samples <- sage_n_samples %||% unique(data$sage_n_samples)
+	method = method %||% unique(data$method)
+	package = package %||% unique(data$package)
+	learner_type = learner_type %||% unique(data$learner_type)
+	sampler = sampler %||% unique(data$sampler)
+	n_samples = n_samples %||% unique(data$n_samples)
+	n_features = n_features %||% unique(data$n_features)
+	n_permutations = n_permutations %||% unique(data$n_permutations)
+	sage_n_samples = sage_n_samples %||% unique(data$sage_n_samples)
 
-	data <- data |>
+	data = data |>
 		dplyr::filter(
 			.data[["method"]] %in% .env[["method"]],
 			.data[["package"]] %in% .env[["package"]],
@@ -403,8 +403,8 @@ plot_runtime <- function(
 	cli::cli_alert_info("n_features: {.val {sort(unique(data$n_features))}}")
 
 	# Set plot variable and axis label based on scale type
-	plot_var <- "runtime"
-	x_lab <- if (scale == "relative") {
+	plot_var = "runtime"
+	x_lab = if (scale == "relative") {
 		if (logscale) {
 			"Runtime (relative to xplainfi, log10)"
 		} else {
@@ -416,7 +416,7 @@ plot_runtime <- function(
 
 	# Compute relative runtime if needed
 	if (scale %in% c("relative", "log10 relative")) {
-		group_cols <- c(
+		group_cols = c(
 			"method",
 			"learner_type",
 			"n_samples",
@@ -426,17 +426,17 @@ plot_runtime <- function(
 			"sage_n_samples",
 			"repl"
 		)
-		group_cols <- intersect(group_cols, names(data))
+		group_cols = intersect(group_cols, names(data))
 
-		baseline <- data[
+		baseline = data[
 			package == "xplainfi",
 			.(baseline_runtime = runtime[1]),
 			by = group_cols
 		]
 
-		data <- merge(data, baseline, by = group_cols, all.x = TRUE)
+		data = merge(data, baseline, by = group_cols, all.x = TRUE)
 		data[, runtime_relative := runtime / baseline_runtime]
-		plot_var <- "runtime_relative"
+		plot_var = "runtime_relative"
 	}
 
 	# Convert numeric columns to factors for proper faceting/coloring
@@ -449,15 +449,15 @@ plot_runtime <- function(
 	data[, algo_label := sprintf("%s (%s)", method, package)]
 
 	# Order by median runtime
-	algo_order <- data[,
+	algo_order = data[,
 		.(med_rt = median(get(plot_var), na.rm = TRUE)),
 		by = algo_label
 	]
-	algo_order <- algo_order[order(med_rt)]
+	algo_order = algo_order[order(med_rt)]
 	data[, algo_label := factor(algo_label, levels = algo_order$algo_label)]
 
 	# Build plot
-	p <- ggplot(
+	p = ggplot(
 		data,
 		aes(
 			x = .data[[plot_var]],
@@ -482,16 +482,16 @@ plot_runtime <- function(
 
 	# Color palette
 	if (color == "package") {
-		p <- p +
+		p = p +
 			scale_fill_manual(values = pal_package, aesthetics = c("fill", "color"))
 	} else {
-		p <- p +
+		p = p +
 			scale_fill_brewer(palette = "Dark2", aesthetics = c("fill", "color"))
 	}
 
 	# Add faceting
 	if (length(facets) > 0) {
-		p <- p +
+		p = p +
 			facet_wrap(
 				facets = facets,
 				ncol = ncol,
@@ -502,17 +502,17 @@ plot_runtime <- function(
 
 	# X-axis scaling with pretty labels
 	if (scale == "relative") {
-		p <- p + geom_vline(xintercept = 1, linetype = "dashed", alpha = 0.5)
+		p = p + geom_vline(xintercept = 1, linetype = "dashed", alpha = 0.5)
 		if (logscale) {
-			p <- p + scale_x_log10(labels = scales::label_number(suffix = "x"))
+			p = p + scale_x_log10(labels = scales::label_number(suffix = "x"))
 		} else {
-			p <- p + scale_x_continuous(labels = scales::label_number(suffix = "x"))
+			p = p + scale_x_continuous(labels = scales::label_number(suffix = "x"))
 		}
 	} else {
 		if (logscale) {
-			p <- p + scale_x_log10(labels = scales::label_number())
+			p = p + scale_x_log10(labels = scales::label_number())
 		} else {
-			p <- p + scale_x_continuous(labels = scales::label_number())
+			p = p + scale_x_continuous(labels = scales::label_number())
 		}
 	}
 
@@ -534,7 +534,7 @@ plot_runtime <- function(
 #' @param labeller function, Defaults to `label_value`. Passed to `facet_wrap()`.
 #' @param base_size numeric(1) Base font size for theme.
 #' @return A ggplot2 object.
-plot_runtime_scaling <- function(
+plot_runtime_scaling = function(
 	runtimes,
 	x_var = c("n_features", "n_samples"),
 	geom = c("boxplot", "pointrange"),
@@ -556,21 +556,21 @@ plot_runtime_scaling <- function(
 	labeller = label_value,
 	base_size = 14
 ) {
-	x_var <- match.arg(x_var)
-	geom <- match.arg(geom)
-	data <- data.table::copy(runtimes)
+	x_var = match.arg(x_var)
+	geom = match.arg(geom)
+	data = data.table::copy(runtimes)
 
 	# Apply filters using dplyr::filter with .data/.env pronouns
-	method <- method %||% unique(data$method)
-	package <- package %||% unique(data$package)
-	learner_type <- learner_type %||% unique(data$learner_type)
-	sampler <- sampler %||% unique(data$sampler)
-	n_samples <- n_samples %||% unique(data$n_samples)
-	n_features <- n_features %||% unique(data$n_features)
-	n_permutations <- n_permutations %||% unique(data$n_permutations)
-	sage_n_samples <- sage_n_samples %||% unique(data$sage_n_samples)
+	method = method %||% unique(data$method)
+	package = package %||% unique(data$package)
+	learner_type = learner_type %||% unique(data$learner_type)
+	sampler = sampler %||% unique(data$sampler)
+	n_samples = n_samples %||% unique(data$n_samples)
+	n_features = n_features %||% unique(data$n_features)
+	n_permutations = n_permutations %||% unique(data$n_permutations)
+	sage_n_samples = sage_n_samples %||% unique(data$sage_n_samples)
 
-	data <- data |>
+	data = data |>
 		dplyr::filter(
 			.data[["method"]] %in% .env[["method"]],
 			.data[["package"]] %in% .env[["package"]],
@@ -597,16 +597,16 @@ plot_runtime_scaling <- function(
 	data[, (x_var) := factor(get(x_var))]
 
 	# x-axis label
-	x_lab <- switch(
+	x_lab = switch(
 		x_var,
 		n_features = "Number of features",
 		n_samples = "Number of samples"
 	)
 
-	y_lab <- if (logscale) "Runtime (seconds, log10)" else "Runtime (seconds)"
+	y_lab = if (logscale) "Runtime (seconds, log10)" else "Runtime (seconds)"
 
 	# Build plot
-	p <- ggplot(
+	p = ggplot(
 		data,
 		aes(
 			x = .data[[x_var]],
@@ -617,7 +617,7 @@ plot_runtime_scaling <- function(
 	)
 
 	if (geom == "boxplot") {
-		p <- p +
+		p = p +
 			geom_boxplot(
 				alpha = 0.7,
 				outlier.size = 0.8,
@@ -625,7 +625,7 @@ plot_runtime_scaling <- function(
 			)
 	} else if (geom == "pointrange") {
 		# Compute summary statistics
-		summary_data <- data[,
+		summary_data = data[,
 			.(
 				mean_runtime = median(runtime, na.rm = TRUE),
 				lower = quantile(runtime, 0.25, na.rm = TRUE),
@@ -634,7 +634,7 @@ plot_runtime_scaling <- function(
 			by = c(x_var, color, facets)
 		]
 
-		p <- ggplot(
+		p = ggplot(
 			summary_data,
 			aes(
 				x = .data[[x_var]],
@@ -649,7 +649,7 @@ plot_runtime_scaling <- function(
 			geom_line(position = position_dodge(width = 0.2), alpha = 0.5)
 	}
 
-	p <- p +
+	p = p +
 		labs(
 			title = if (title) sprintf("Runtime scaling by %s", x_lab) else NULL,
 			x = x_lab,
@@ -665,23 +665,23 @@ plot_runtime_scaling <- function(
 
 	# Color palette
 	if (color == "package") {
-		p <- p +
+		p = p +
 			scale_fill_manual(values = pal_package, aesthetics = c("fill", "color"))
 	} else {
-		p <- p +
+		p = p +
 			scale_fill_brewer(palette = "Dark2", aesthetics = c("fill", "color"))
 	}
 
 	# Y-axis scaling
 	if (logscale) {
-		p <- p + scale_y_log10(labels = scales::label_number())
+		p = p + scale_y_log10(labels = scales::label_number())
 	} else {
-		p <- p + scale_y_continuous(labels = scales::label_number())
+		p = p + scale_y_continuous(labels = scales::label_number())
 	}
 
 	# Add faceting
 	if (length(facets) > 0) {
-		p <- p +
+		p = p +
 			facet_wrap(
 				facets = facets,
 				ncol = ncol,
