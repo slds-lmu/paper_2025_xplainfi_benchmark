@@ -1,5 +1,5 @@
 # https://coolors.co/1e3888-ef476f-f5e663-ffad69-9c3848
-pal_package = c(
+pal_package <- c(
 	xplainfi = "#1e3888",
 	fippy = "#8CD867",
 	vip = "#A31621",
@@ -163,6 +163,169 @@ plot_importance <- function(
 				dir = "h",
 				ncol = ncol,
 				nrow = nrow,
+				labeller = label_wrap_gen(multi_line = multi_line)
+			)
+	}
+
+	p
+}
+
+#' Plot pairwise differences in importance between a baseline package and each
+#' reference implementation, paired within replication (i.e., on identical datasets).
+#'
+#' For each experimental cell (problem, method, learner, feature, replication, and
+#' correlation where applicable), the importance of `baseline` is subtracted from
+#' each reference package's importance. Boxplots show the distribution of these
+#' paired differences across replications; values centered on zero indicate agreement.
+#'
+#' @param importances data.table of importances, produced by `clean_results_importance()`.
+#' @param type One of `"scaled"` (differences of importances scaled to [0, 1] per job,
+#'   i.e. percentage points; default) or `"raw"` (differences of raw importance scores).
+#' @param problem,method,learner_type,feature character() specification of experiment
+#'   parameter to select (one or more). If `NULL`, all available are used.
+#' @param baseline character(1) Package used as the minuend (default `"xplainfi"`).
+#' @param exclude_packages character() Packages dropped before pairing (default `"vip"`,
+#'   whose RMSE-based PFI is not directly comparable on the MSE scale).
+#' @param facets character() Variable name(s) to facet by via `ggplot2::facet_wrap()`.
+#' @param ncol,nrow integer(1) passed to `facet_wrap()`.
+#' @param title logical(1) Toggle title (showing problem label).
+#' @param feature_sort One of `"importance"` (order by spread of differences) or `"name"`.
+#' @param multi_line logical(1) passed to the facet labeller.
+#' @param base_size numeric(1) Base font size for theme.
+plot_importance_diff <- function(
+	importances,
+	type = c("scaled", "raw"),
+	problem = NULL,
+	method = NULL,
+	learner_type = NULL,
+	feature = NULL,
+	baseline = "xplainfi",
+	exclude_packages = "vip",
+	facets = c("method", "learner_type"),
+	ncol = NULL,
+	nrow = NULL,
+	title = FALSE,
+	feature_sort = c("importance", "name"),
+	multi_line = TRUE,
+	base_size = 14
+) {
+	checkmate::assert_subset(problem, as.character(unique(importances$problem)))
+	checkmate::assert_subset(method, as.character(unique(importances$method)))
+	checkmate::assert_subset(
+		learner_type,
+		as.character(unique(importances$learner_type))
+	)
+	type <- match.arg(type)
+	feature_sort <- match.arg(feature_sort)
+	value_col <- switch(type, scaled = "importance_scaled", raw = "importance")
+
+	dat <- data.table::as.data.table(importances)
+
+	sel_problem <- problem %||% unique(as.character(dat$problem))
+	sel_method <- method %||% unique(as.character(dat$method))
+	sel_learner <- learner_type %||% unique(as.character(dat$learner_type))
+	sel_feature <- feature %||% unique(as.character(dat$feature))
+	sel_exclude <- exclude_packages
+
+	dat <- dat[
+		as.character(problem) %in%
+			sel_problem &
+			as.character(method) %in% sel_method &
+			as.character(learner_type) %in% sel_learner &
+			as.character(feature) %in% sel_feature &
+			!(as.character(package) %in% sel_exclude)
+	]
+
+	key <- intersect(
+		c("problem", "method", "learner_type", "feature", "repl", "correlation"),
+		names(dat)
+	)
+
+	# Collapse any duplicate measurements per cell + package to a single value
+	dat <- dat[,
+		.(value = mean(get(value_col), na.rm = TRUE)),
+		by = c(key, "package")
+	]
+
+	wide <- data.table::dcast(
+		dat,
+		stats::as.formula(paste(paste(key, collapse = " + "), "~ package")),
+		value.var = "value"
+	)
+
+	if (!baseline %in% names(wide)) {
+		stop("Baseline package '", baseline, "' not present in the data.")
+	}
+	refs <- setdiff(unique(as.character(dat$package)), baseline)
+
+	diff_long <- data.table::rbindlist(lapply(refs, function(pkg) {
+		w <- wide[!is.na(get(baseline)) & !is.na(get(pkg))]
+		if (!nrow(w)) {
+			return(NULL)
+		}
+		out <- w[, ..key]
+		out[, package := pkg]
+		out[, diff := w[[baseline]] - w[[pkg]]]
+		out[]
+	}))
+
+	if (is.null(diff_long) || !nrow(diff_long)) {
+		stop("No paired observations found for the requested selection.")
+	}
+
+	# Keep package colouring consistent with the rest of the report
+	diff_long[, package := factor(package, levels = intersect(names(pal_package), unique(package)))]
+
+	if (feature_sort == "importance") {
+		diff_long[, feature := forcats::fct_reorder(feature, abs(diff), .fun = median)]
+	} else {
+		diff_long[, feature := forcats::fct_rev(factor(feature))]
+	}
+
+	title_lab <- NULL
+	if (title) {
+		problem_lab <- glue::glue_collapse(problem, sep = ", ", last = ", and ")
+		title_lab <- glue::glue("Problem: {problem_lab}")
+	}
+
+	x_lab <- switch(
+		type,
+		scaled = glue::glue("Scaled importance difference ({baseline} − reference, %)"),
+		raw = glue::glue("Raw importance difference ({baseline} − reference)")
+	)
+
+	p <- ggplot(
+		diff_long,
+		aes(x = diff, y = feature, color = package, fill = package)
+	) +
+		geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.5) +
+		geom_boxplot(alpha = 3 / 4, outlier.size = 1, outlier.alpha = .5) +
+		labs(
+			title = title_lab,
+			x = x_lab,
+			y = "Feature",
+			color = NULL,
+			fill = NULL
+		) +
+		scale_fill_manual(values = pal_package, aesthetics = c("color", "fill")) +
+		theme_minimal(base_size = base_size) +
+		theme(legend.position = "top", plot.title.position = "plot")
+
+	if (type == "scaled") {
+		# Scaled importances live in [0, 1]; show differences as percentage points
+		p <- p + scale_x_continuous(labels = scales::label_percent(suffix = ""))
+	}
+
+	if (length(facets) > 0) {
+		p <- p +
+			facet_wrap(
+				facets = facets,
+				dir = "h",
+				ncol = ncol,
+				nrow = nrow,
+				# Scaled differences share the [-100, 100] pp range, so a common axis
+				# aids comparison; raw magnitudes differ across methods, so free them.
+				scales = if (type == "scaled") "fixed" else "free_x",
 				labeller = label_wrap_gen(multi_line = multi_line)
 			)
 	}

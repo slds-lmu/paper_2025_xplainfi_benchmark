@@ -20,7 +20,10 @@ knitr::opts_chunk$set(
 library(ggplot2)
 library(data.table)
 source(here::here("R", "plotting.R"))
+source(here::here("R", "clean-results.R"))
 importances <- readRDS(here::here("results", "importance", "importances.rds"))
+# Earlier SAGE runs were superseded by a re-run; keep the newest run per cell.
+importances <- dedup_latest_run(importances)
 ```
 
 Importance results in the form of boxplots split across FI method and learner type, separately for each dataset / DGP.
@@ -351,6 +354,132 @@ plot_importance(
 	problem = "bike_sharing",
 	method = NULL,
 	color = "package",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+## Pairwise differences to xplainfi (scaled) {.tabset}
+
+The plots above show the distribution of importance scores across replications for each implementation separately.
+As suggested by a reviewer, the plots below instead show the distribution of the *paired difference* in importance between \CRANpkg{xplainfi} and each reference implementation, where both scores are computed within the same replication, i.e., on identical train-test splits.
+For each feature, method, learner, and replication, we subtract the reference package's importance from \CRANpkg{xplainfi}'s; boxplots centered on the dashed line at zero therefore indicate agreement on a given dataset, which is more informative than comparing marginal distributions.
+Differences are computed on the scaled importances (scaled to `[0, 1]` per implementation and replication, as in the figures above), so they are expressed in percentage points and share a common axis.
+
+The `vip` package is omitted here because it reports importance on the RMSE scale rather than MSE, so the comparison is not directly meaningful; this is addressed separately.
+
+### Confounded
+
+```{r plot-confounded-diff}
+#| fig.cap: Paired differences in scaled importance (xplainfi − reference, percentage points) for the Confounded task by FI method and learner, colored by reference package.
+plot_importance_diff(
+	importances,
+	problem = "confounded",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+### Correlated
+
+```{r plot-correlated-25-diff}
+#| fig.cap: Paired differences in scaled importance (xplainfi − reference, percentage points) for the Correlated (r = 0.25) task by FI method and learner, colored by reference package.
+plot_importance_diff(
+	importances[correlation == 0.25],
+	problem = "correlated",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+```{r plot-correlated-75-diff}
+#| fig.cap: Paired differences in scaled importance (xplainfi − reference, percentage points) for the Correlated (r = 0.75) task by FI method and learner, colored by reference package.
+plot_importance_diff(
+	importances[correlation == 0.75],
+	problem = "correlated",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+### Ewald
+
+```{r plot-ewald-diff}
+#| fig.cap: Paired differences in scaled importance (xplainfi − reference, percentage points) for the Ewald task by FI method and learner, colored by reference package.
+plot_importance_diff(
+	importances,
+	problem = "ewald",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+### Friedman1
+
+```{r plot-friedman1-diff}
+#| fig.height: 14
+#| fig.cap: Paired differences in scaled importance (xplainfi − reference, percentage points) for the Friedman1 task by FI method and learner, colored by reference package.
+plot_importance_diff(
+	importances,
+	problem = "friedman1",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+### Independent
+
+```{r plot-independent-diff}
+#| fig.cap: Paired differences in scaled importance (xplainfi − reference, percentage points) for the Independent task by FI method and learner, colored by reference package.
+plot_importance_diff(
+	importances,
+	problem = "independent",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+### Interactions
+
+```{r plot-interactions-diff}
+#| fig.cap: Paired differences in scaled importance (xplainfi − reference, percentage points) for the Interactions task by FI method and learner, colored by reference package.
+plot_importance_diff(
+	importances,
+	problem = "interactions",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+### Mediated
+
+```{r plot-mediated-diff}
+#| fig.cap: Paired differences in scaled importance (xplainfi − reference, percentage points) for the mediated task by FI method and learner, colored by reference package.
+plot_importance_diff(
+	importances,
+	problem = "mediated",
+	facets = c("method", "learner_type"),
+	ncol = 4,
+	title = TRUE
+)
+```
+
+### Bike sharing
+
+```{r plot-bikesharing-diff}
+#| fig.height: 13
+#| fig.cap: Paired differences in scaled importance (xplainfi − reference, percentage points) for the bike sharing task by FI method and learner, colored by reference package.
+plot_importance_diff(
+	importances,
+	problem = "bike_sharing",
 	facets = c("method", "learner_type"),
 	ncol = 4,
 	title = TRUE
