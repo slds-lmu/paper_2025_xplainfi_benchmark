@@ -1,11 +1,33 @@
 # Importance -------------------------------------------------------------
 
+#' Keep only the most recent run for each experiment cell.
+#'
+#' Some experiments were run more than once across registry batches: the SAGE methods
+#' were re-run after the `min_permutations` parameter was introduced, so those cells
+#' carry two `job.id`s (an earlier one with `min_permutations = NA` and the current one
+#' with `min_permutations = 20`). This keeps the newest run (largest `job.id`) per cell;
+#' cells with a single run -- i.e. all other methods/packages -- are returned unchanged.
+#' Safe to call on already-deduplicated data (it is then a no-op).
+#' @param importances data.table with a `job.id` column and experiment identifiers.
+dedup_latest_run <- function(importances) {
+	importances <- data.table::as.data.table(importances)
+	cell_keys <- intersect(
+		c("problem", "method", "package", "learner_type", "feature", "repl", "correlation"),
+		names(importances)
+	)
+	if (!("job.id" %in% names(importances)) || length(cell_keys) == 0L) {
+		return(importances)
+	}
+	data.table::setorderv(importances, "job.id", order = -1L)
+	unique(importances, by = cell_keys)
+}
+
 #' Aggregate results from batchtools registry
 #' @param results Result table as returned by reduceResultsDataTable(). Read from `here::here("results", "importance", "results.rds")` if NULL.
 clean_results_importance <- function(results, job_pars) {
-	tmpres = data.table::rbindlist(results$result, fill = TRUE)
-	tmpres = cbind(results[, .(job.id)], tmpres)
-	res = ijoin(
+	tmpres <- data.table::rbindlist(results$result, fill = TRUE)
+	tmpres <- cbind(results[, .(job.id)], tmpres)
+	res <- ijoin(
 		tmpres,
 		job_pars[, .(
 			job.id,
@@ -19,7 +41,11 @@ clean_results_importance <- function(results, job_pars) {
 			n_repeats,
 			sampler,
 			n_permutations,
-			sage_n_samples
+			sage_n_samples,
+			# SAGE-only parameter; the registry holds two SAGE runs (an earlier one
+			# without `min_permutations` (NA) and the current one with `min_permutations = 20`).
+			# Omitting it collapsed these distinct jobs into apparent duplicates.
+			min_permutations
 		)],
 		by = "job.id"
 	)
@@ -85,15 +111,21 @@ clean_results_importance <- function(results, job_pars) {
 	# res |> dplyr::count(algorithm, method, package, sampler)
 
 	# Extract importances
-	importances = rbindlist(
+	importances <- rbindlist(
 		lapply(results$job.id, \(x) {
-			importances = results[job.id == x, result[[1]]$importance]
+			importances <- results[job.id == x, result[[1]]$importance]
 			importances[, job.id := x]
 		}),
 		fill = TRUE
 	)
 	# Add job parameters (algorithm, problem parameters, ...)
-	importances = merge(res[, -"importance"], importances, by = "job.id")
+	importances <- merge(res[, -"importance"], importances, by = "job.id")
+
+	# The registry contains an earlier SAGE run (min_permutations = NA) superseded by
+	# the current one (min_permutations = 20), so those cells have two jobs. Keep the
+	# newest run (largest job.id) per experiment cell; cells with a single job (all
+	# other methods/packages) are unaffected.
+	importances <- dedup_latest_run(importances)
 
 	importances[, language := fifelse(package %in% c("fippy", "sage"), "Python", "R")]
 	importances[,
