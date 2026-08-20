@@ -1,6 +1,6 @@
 ---
 title: "Importance benchmark results"
-format: 
+output:
   html_document:
     self_contained: false
     toc: true
@@ -17,6 +17,12 @@ knitr::opts_chunk$set(
 	fig.width = 10,
 	fig.align = "center"
 )
+# Shrink rendered PNGs losslessly; skipped where optipng is unavailable
+if (nzchar(Sys.which("optipng"))) {
+	knitr::knit_hooks$set(optipng = knitr::hook_optipng)
+	knitr::opts_chunk$set(optipng = "-o2 -quiet")
+}
+
 library(ggplot2)
 library(data.table)
 source(here::here("R", "plotting.R"))
@@ -363,8 +369,8 @@ plot_importance(
 ## Pairwise differences to xplainfi (scaled) {.tabset}
 
 The plots above show the distribution of importance scores across replications for each implementation separately.
-As suggested by a reviewer, the plots below instead show the distribution of the *paired difference* in importance between \CRANpkg{xplainfi} and each reference implementation, where both scores are computed within the same replication, i.e., on identical train-test splits.
-For each feature, method, learner, and replication, we subtract the reference package's importance from \CRANpkg{xplainfi}'s; boxplots centered on the dashed line at zero therefore indicate agreement on a given dataset, which is more informative than comparing marginal distributions.
+As suggested by a reviewer, the plots below instead show the distribution of the *paired difference* in importance between `xplainfi` and each reference implementation, where both scores are computed within the same replication, i.e., on identical train-test splits.
+For each feature, method, learner, and replication, we subtract the reference package's importance from `xplainfi`'s; boxplots centered on the dashed line at zero therefore indicate agreement on a given dataset, which is more informative than comparing marginal distributions.
 Differences are computed on the scaled importances (scaled to `[0, 1]` per implementation and replication, as in the figures above), so they are expressed in percentage points and share a common axis.
 
 The `vip` package is omitted here because it reports importance on the RMSE scale rather than MSE, so the comparison is not directly meaningful; this is addressed separately.

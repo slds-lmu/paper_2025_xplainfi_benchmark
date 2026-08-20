@@ -1,6 +1,6 @@
 ---
 title: "Runtime benchmark results"
-format: 
+output:
   html_document:
     self_contained: false
     toc: true
@@ -17,6 +17,12 @@ knitr::opts_chunk$set(
 	fig.width = 10,
 	fig.align = "center"
 )
+# Shrink rendered PNGs losslessly; skipped where optipng is unavailable
+if (nzchar(Sys.which("optipng"))) {
+	knitr::knit_hooks$set(optipng = knitr::hook_optipng)
+	knitr::opts_chunk$set(optipng = "-o2 -quiet")
+}
+
 library(ggplot2)
 library(data.table)
 source(here::here("R", "plotting.R"))
