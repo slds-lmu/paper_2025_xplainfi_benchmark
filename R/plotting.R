@@ -7,6 +7,12 @@ pal_package = c(
 	sage = "#EF476F"
 )
 
+# Base-R stand-in for forcats::fct_rev, avoiding a dependency for one operation
+fct_rev = function(x) {
+	x = factor(x)
+	factor(x, levels = rev(levels(x)))
+}
+
 #' Plot importances as box plots with feature on the y-axis and importance on the x-axis.
 #'
 #' @param importances ta.table of importance, produced by `clean_results_importance()`
@@ -111,10 +117,10 @@ plot_importance = function(
 
 	if (feature_sort == "importance") {
 		importance_subset = importance_subset |>
-			dplyr::mutate(feature = forcats::fct_reorder(feature, importance))
+			dplyr::mutate(feature = stats::reorder(feature, importance, FUN = median))
 	} else if (feature_sort == "name") {
 		importance_subset = importance_subset |>
-			dplyr::mutate(feature = forcats::fct_rev(feature))
+			dplyr::mutate(feature = fct_rev(feature))
 	}
 
 	p = importance_subset |>
@@ -277,9 +283,9 @@ plot_importance_diff = function(
 	diff_long[, package := factor(package, levels = intersect(names(pal_package), unique(package)))]
 
 	if (feature_sort == "importance") {
-		diff_long[, feature := forcats::fct_reorder(feature, abs(diff), .fun = median)]
+		diff_long[, feature := stats::reorder(feature, abs(diff), FUN = median)]
 	} else {
-		diff_long[, feature := forcats::fct_rev(factor(feature))]
+		diff_long[, feature := fct_rev(feature)]
 	}
 
 	title_lab = NULL
