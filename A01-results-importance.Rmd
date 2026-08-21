@@ -25,9 +25,9 @@ if (nzchar(Sys.which("optipng"))) {
 
 library(ggplot2)
 library(data.table)
-source(here::here("R", "plotting.R"))
-source(here::here("R", "clean-results.R"))
-importances <- readRDS(here::here("results", "importance", "importances.rds"))
+source("R/plotting.R")
+source("R/clean-results.R")
+importances <- readRDS("results/importance/importances.rds")
 # Earlier SAGE runs were superseded by a re-run; keep the newest run per cell.
 importances <- dedup_latest_run(importances)
 ```

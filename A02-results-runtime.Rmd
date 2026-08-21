@@ -25,8 +25,8 @@ if (nzchar(Sys.which("optipng"))) {
 
 library(ggplot2)
 library(data.table)
-source(here::here("R", "plotting.R"))
-runtime <- readRDS(here::here("results", "runtime", "runtime.rds"))
+source("R/plotting.R")
+runtime <- readRDS("results/runtime/runtime.rds")
 ```
 
 These are the results as boxplots split across FI method with varying $n$ (`n_samples`) and $p$ (`n_features`).
